@@ -3,6 +3,7 @@ import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } 
 import AdminLayout from '../modules/admin/AdminLayout'
 import EmpleadoLayout from '../modules/empleado/EmpleadoLayout'
 import UsuarioLayout from '../modules/usuario/UsuarioLayout'
+import LandingPage from '../modules/landingPage/LandingPage'
 
 export default function AppRouter() {
 
@@ -21,6 +22,11 @@ export default function AppRouter() {
 
                 {/** Usuario */}
                 <Route path='/usuario' element={ <UsuarioLayout/> }>
+
+                </Route>
+
+                {/** landingPaage */}
+                <Route path='/' element={ <LandingPage/> }>
 
                 </Route>
             </>
