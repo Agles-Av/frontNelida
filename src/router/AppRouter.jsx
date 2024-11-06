@@ -4,6 +4,7 @@ import AdminLayout from '../modules/admin/AdminLayout'
 import EmpleadoLayout from '../modules/empleado/EmpleadoLayout'
 import UsuarioLayout from '../modules/usuario/UsuarioLayout'
 import LandingPage from '../modules/landingPage/LandingPage'
+import LandingLayout from '../modules/landingPage/LandingLayout'
 
 export default function AppRouter() {
 
@@ -26,8 +27,8 @@ export default function AppRouter() {
                 </Route>
 
                 {/** landingPaage */}
-                <Route path='/' element={ <LandingPage/> }>
-
+                <Route path='/' element={ <LandingPage/>}>
+            
                 </Route>
             </>
         )
