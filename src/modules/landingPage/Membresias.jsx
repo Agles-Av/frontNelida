@@ -107,7 +107,7 @@ const Membresias = () => {
                     <div class="grid">
                         <div class="col" >
                             <div className="card flex justify-content-center">
-                                <Card header={header} title={membresias[0].price} subTitle={membresias[0].price} footer={footer} className="md:w-25rem shadow-5 ">
+                                <Card on  header={header} title={membresias[0].price} subTitle={membresias[0].price} footer={footer} className="md:w-25rem shadow-5 ">
                                     <div className='text-justify'>
                                         <ul class="list-disc">
                                             <li>Lorem ipsum dolor sit amet...</li>

@@ -41,7 +41,7 @@ const Carrusel = () => {
 
     const productTemplate = (product) => {
         return (
-            <div className="p-col flex justify-content-center align-items-center p-2">
+            <div className="p-col flex justify-content-center align-items-center p-2 mt-3">
                 <div className="p-shadow-4 border-round p-p-2" style={{ width: '100%', maxWidth: '1500px', height: '500px' }}>
                     <img
                         src={product.image}
