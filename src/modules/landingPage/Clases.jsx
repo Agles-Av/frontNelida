@@ -33,8 +33,8 @@ const Clases = () => {
     ];
 
     return (
-        <div className="w-full">
-            <Card className='border-transparent shadow-none'>
+        <div className="w-full mt-5">
+            <Card className='border-transparent shadow-none '>
                 <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases</h1>
                 <div className="grid">
                     {clases.map((clase, index) => (

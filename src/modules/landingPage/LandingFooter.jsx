@@ -3,7 +3,7 @@ import React from 'react';
 
 const LandingFooter = () => {
     return (
-        <div className="grid border-top-2 border-200 py-5 ">
+        <div className="grid border-top-2 border-200 py-5 mt-5">
 
            
             <div className="col-12 md:col-4 text-center">
