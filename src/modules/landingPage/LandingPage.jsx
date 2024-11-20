@@ -3,6 +3,7 @@ import LandingLayout from './LandingLayout'
 import Carrusel from './Carrusel'
 import Membresias from './Membresias'
 import Clases from './Clases'
+import LandingFooter from './LandingFooter'
 
 
 const LandingPage = () => {
@@ -14,6 +15,7 @@ const LandingPage = () => {
                 <Membresias />
                 <Clases />
             </div>
+            <LandingFooter/>
         </>
     )
 

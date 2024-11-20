@@ -63,13 +63,13 @@ const Membresias = () => {
                 <div className="grid">
                     {membresias.map((membresia, index) => (
                         <div key={index} className="col">
-                            <div className="card flex justify-content-center">
+                            <div className="card flex justify-content-center ">
                                 <Card
                                     header={<h1 className="text-center">{membresia.name}</h1>}
                                     title={membresia.price}
                                     subTitle={membresia.price}
                                     footer={footer}
-                                    className="md:w-25rem shadow-5"
+                                    className={`col ${index === 1 ? 'bg-blue-900 md:w-25rem shadow-5 text-color-secondary ' : 'md:w-25rem shadow-5'}`}
                                 >
                                     <div className='text-justify'>
                                         <ul className="list-disc">

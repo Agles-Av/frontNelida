@@ -33,18 +33,22 @@ const Clases = () => {
     ];
 
     return (
-        <div className="w-full p-2">
-            <h1 className="text-6xl font-bold text-left mb-4 text-primary">Clases</h1>
+        <div className="w-full">
+            <Card className='border-transparent shadow-none'>
+                <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases</h1>
                 <div className="grid">
-                    {clases.map((clase, index) => (   
+                    {clases.map((clase, index) => (
                         <div key={index} className="col-12 md:col-4 mt-2">
                             <Card title={clase.nombre} subTitle="Instructor: Juan Perez" footer={footer} >
-                            <img src={clase.imagen} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
+                                <img src={clase.imagen} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
                                 <p className="p-m-0">{clase.descripcion}</p>
                             </Card>
                         </div>
                     ))}
                 </div>
+
+            </Card>
+
         </div>
     );
 };
