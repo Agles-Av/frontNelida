@@ -11,11 +11,20 @@ const LandingPage = () => {
         <>
             <LandingLayout />
             <div className='p-5'>
-                <Carrusel />
-                <Membresias />
-                <Clases />
+                <div id='Carrusel'>
+                    <Carrusel />
+                </div>
+                <div id='membresias'>
+                    <Membresias />
+                </div>
+                <div id='Clases'>
+                    <Clases />
+                </div>
             </div>
-            <LandingFooter/>
+            <div id='footer'>
+                 <LandingFooter/>
+            </div>
+           
         </>
     )
 
