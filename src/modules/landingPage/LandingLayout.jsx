@@ -5,9 +5,11 @@ import { Avatar } from 'primereact/avatar';
 import { scroller } from 'react-scroll';
 import { useTheme } from '../../context/ThemeContext';
 import ModaLogin from './ModaLogin';
+import ModalLog from './components/ModalLog';
 
 const LandingLayout = () => {
     const [visible, setVisible] = useState(false); // Estado para la visibilidad del modal
+    const [visibleR, setVisibleR] = useState(false); // Estado para la visibilidad del modal
     const { toggleTheme } = useTheme();
 
     const items = [
@@ -68,9 +70,10 @@ const LandingLayout = () => {
             <Button
                 label="Inicia sesión"
                 className="p-button-text"
+                onClick={() => setVisibleR(true)} // Abrir el modal de login
             />
             <Button label="Regístrate" className="p-button-primary"
-                onClick={() => setVisible(true)} // Abrir el modal
+                onClick={() => setVisible(true)} // Abrir el modal de registro
             />
         </div>
     );
@@ -83,6 +86,10 @@ const LandingLayout = () => {
             <ModaLogin
                 abrir={visible} // Pasar el estado como prop
                 onHide={() => setVisible(false)} // Cerrar el modal
+            />
+            <ModalLog
+            abrir={visibleR} // Pasar el estado como prop
+            onHide={() => setVisibleR(false)} // Cerrar el modal
             />
         </div>
     );

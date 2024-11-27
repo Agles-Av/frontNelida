@@ -1,22 +1,19 @@
-//
 export const authManager = (
-    state = { signed: false }, //un objeto de clave valor 
-    action //
+    state = { signed: false, roleUser: null },
+    action
 ) => {
     switch (action.type) {
         case "SIGNIN":
             return {
-                ...action.payload, //... significa que accedera a todos los elementos de action y accedera a payload
+                ...state,
+                ...action.payload,
                 signed: true,
-            }
-            break;
+            };
         case "SIGNOUT":
-            return {
-                signed: false,
-            }
-            break;
+            localStorage.removeItem("user");
+            localStorage.removeItem("roleUser");
+            return { signed: false, roleUser: null };
         default:
             return state;
-
     }
-}
+};

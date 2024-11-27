@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import LandingLayout from './LandingLayout'
 import Carrusel from './Carrusel'
 import Membresias from './Membresias'
 import Clases from './Clases'
 import LandingFooter from './LandingFooter'
-
+import AxiosCLient from '../../config/http-gateway/http-client'
 
 const LandingPage = () => {
+
     return (
         <>
             <LandingLayout />

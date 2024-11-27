@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
+const SERVER_URL = import.meta.env.VITE_APP_SERVER_URL;
 export const AxiosCLient = axios.create({
     baseURL: SERVER_URL,
     withCredentials: false
@@ -10,13 +10,14 @@ export const AxiosCLient = axios.create({
 const requestHandler = (request) => {
     request.headers["Accept"] = "application/json";
     request.headers["Content-Type"] = "application/json";
-    /*
-    const session = JSON.parse(localStorage.getItem("user")) || null;
 
+    const session = JSON.parse(localStorage.getItem("user")) || null;
+    
     if (session?.token) 
         request.headers["Authorization"] = `Bearer ${session.token}`;
         return request
-    */
+
+   return request;
 };
 
 AxiosCLient.interceptors.request.use(
