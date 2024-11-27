@@ -1,14 +1,14 @@
 import React from 'react'
-import Carrusel from './Componentes/Carrusel'
-import Membresias from './Componentes/Membresias'
-import Clases from './Componentes/Clases'
-import LandingFooter from './Componentes/LandingFooter'
-import LandingLayout from './Componentes/LandingLayout'
-import LandingPage from './Componentes/LandingPage'
+import LandingLayout from './LandingLayout'
+import Carrusel from './Carrusel'
+import Membresias from './Membresias'
+import Clases from './Clases'
+import LandingFooter from './LandingFooter'
 
-const UsuarioLayout = () => {
-  return (
-    <>
+
+const LandingPage = () => {
+    return (
+        <>
             <LandingLayout />
             <div className='p-5'>
                 <div id='Carrusel'>
@@ -26,7 +26,8 @@ const UsuarioLayout = () => {
             </div>
            
         </>
-  );
-};
+    )
 
-export default UsuarioLayout
+}
+
+export default LandingPage
