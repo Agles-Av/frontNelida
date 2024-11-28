@@ -9,18 +9,27 @@ import { InputText } from 'primereact/inputtext';
 const Clases = () => {
     const [clases, setClases] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedClass, setSelectedClass] = useState(null); // Clase seleccionada
+    const [selectedClass, setSelectedClass] = useState(null);
     const [email, setEmail] = useState('');
-    const [fecha, setFecha] = useState(null);
+    const [fecha, setFecha] = useState(new Date());
     const [showDialog, setShowDialog] = useState(false);
 
-    // URL base desde el archivo .env
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
 
-    // Token de autenticación
-    const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYWZhdG9mb2ZvQGdtYWlsLmNvbSIsInJvbGVzIjpbeyJhdXRob3JpdHkiOiJBRE1JTiJ9XSwiaWF0IjoxNzMyNjc2NzMzLCJleHAiOjE3MzMyODE1MzN9.UA4u-1R62TdlRibwaNZyahkZIWYMyEXrKOCqRCoZ9MQ';
+    // Obtener datos del usuario desde localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user?.token;
+    const userId = user?.userId.id;
+    console.log('User:', user.userId.id);
+    console.log('Email', user.userId.email);
+    
+    
 
     useEffect(() => {
+        if (!token) {
+            console.error('No token found in localStorage');
+            return;
+        }
         const fetchClases = async () => {
             try {
                 const response = await axios.get(`${BASE_URL}/clase/`, {
@@ -28,40 +37,77 @@ const Clases = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                const data = response.data.data;
-                setClases(data);
+                setClases(response.data.data);
             } catch (error) {
                 console.error('Error fetching clases:', error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchClases();
     }, [BASE_URL, token]);
 
     const handleSuscribirse = (clase) => {
         setSelectedClass(clase);
+        setEmail(user?.userId.email || '');
         setShowDialog(true);
     };
 
-    const handleConfirm = () => {
-        console.log('Email:', email);
-        console.log('Fecha:', fecha);
-        console.log('Clase:', selectedClass);
+    const handleConfirm = async () => {
+        if (!selectedClass || !selectedClass.id) {
+            alert('Por favor, selecciona una clase válida.');
+            return;
+        }
+        if (!userId) {
+            alert('Usuario no válido. Por favor, inicia sesión nuevamente.');
+            return;
+        }
+        if (!fecha) {
+            alert('Por favor selecciona una fecha antes de confirmar.');
+            return;
+        }
 
-        // Aquí podrías realizar una petición al backend para registrar la suscripción
-        // axios.post(`${BASE_URL}/suscripcion`, { email, fecha, claseId: selectedClass.id });
+        const payload = {
+            userId: userId, // ID del usuario desde localStorage
+        };
 
-        setShowDialog(false);
-        setEmail('');
-        setFecha(null);
+        try {
+            await axios.patch(`${BASE_URL}/clase/newPart/${selectedClass.id}`, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            alert('¡Suscripción exitosa!');
+        } catch (error) {
+            if (error.response) {
+                console.error('Error response:', error.response);
+                if (error.response.status === 400) {
+                    alert('Datos inválidos. Revisa la información enviada.');
+                } else if (error.response.status === 401) {
+                    alert('No autorizado. Por favor, inicia sesión nuevamente.');
+                } else {
+                    alert('Error del servidor. Intenta más tarde.');
+                }
+            } else if (error.request) {
+                console.error('Error request:', error.request);
+                alert('No se pudo conectar al servidor. Verifica tu conexión.');
+            } else {
+                console.error('Error general:', error.message);
+                alert('Error desconocido. Intenta nuevamente.');
+            }
+        } finally {
+            setShowDialog(false);
+            setEmail('');
+            setFecha(new Date());
+        }
     };
 
     const handleCancel = () => {
         setShowDialog(false);
         setEmail('');
-        setFecha(null);
+        setFecha(new Date());
     };
 
     if (loading) {
@@ -87,11 +133,11 @@ const Clases = () => {
                                 }
                             >
                                 <img
-                                    src={clase.foto} // Ajusta esta línea si necesitas transformar la URL de la imagen.
+                                    src={clase.foto.length >5 || 'src/assets/Cardio.jpg'}
                                     alt={clase.nombre}
                                     className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
                                 />
-                                <p className="p-m-0">{clase.descripcion}</p>
+                                <p>{clase.descripcion}</p>
                             </Card>
                         </div>
                     ))}
@@ -112,6 +158,7 @@ const Clases = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Ingresa tu correo"
                         className="w-full"
+                        disabled
                     />
                 </div>
                 <div className="field mt-3">
