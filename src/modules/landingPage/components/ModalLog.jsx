@@ -42,6 +42,7 @@ const ModalLog = ({ abrir, onHide }) => {
                 token: response.data.token,
                 roleUser: response.data.role.nombre,
                 signed: true,
+                userId: response.data.user,
             };
     
             // Actualizar contexto y localStorage

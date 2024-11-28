@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { scroller } from 'react-scroll';
 import { useTheme } from '../../../context/ThemeContext';
+import LoggOutButton from '../../../components/LoggOutButton';
 
 const LandingLayout = () => {
     const { toggleTheme } = useTheme();
@@ -52,7 +53,7 @@ const LandingLayout = () => {
     ];
     const end = (
         <div className="flex align-items-center gap-2">
-            <Button label="Cerrar sesión" className="p-button-primary" />
+            <LoggOutButton />
         </div>
     );
 
