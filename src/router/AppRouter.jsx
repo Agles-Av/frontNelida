@@ -6,6 +6,7 @@ import UsuarioLayout from '../modules/usuario/UsuarioLayout'
 import LandingPage from '../modules/landingPage/LandingPage'
 import LandingLayout from '../modules/landingPage/LandingLayout'
 import AuthContext from '../config/context/auth-context'
+import AdminPage from '../modules/admin/AdminPage'
 
 export default function AppRouter() {
     const { user } = useContext(AuthContext);
@@ -21,7 +22,7 @@ export default function AppRouter() {
             case 'EMPLEADO':
                 return <Route path='/empleado' element={<EmpleadoLayout />} />;
             case 'ADMIN':
-                return <Route path='/admin' element={<AdminLayout />} />;
+                return <Route path='/admin' element={<AdminPage />} />;
             case 'CLIENTE':
                 return <Route path='/cliente' element={<UsuarioLayout />} />;
             default:
