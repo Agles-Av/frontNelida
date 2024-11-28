@@ -21,7 +21,7 @@ const ModalLog = ({ abrir, onHide }) => {
         ,
 
         password: Yup.string()
-            .min(6, 'La contraseña debe tener al menos 8 caracteres')
+            .min(2, 'La contraseña debe tener al menos 2 caracteres')
             .required('La contraseña es obligatoria'),
     });
 
