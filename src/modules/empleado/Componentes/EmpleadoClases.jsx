@@ -15,7 +15,7 @@ const EmpleadoClases = ()=>{
     const clases = [
         {
             nombre: 'Zumba',
-            descripcion: '"¡Bienvenidos a nuestra clase de Zumba! Prepárense para disfrutar una hora llena de energía, música y movimientos divertidos. No importa tu nivel, lo importante es moverte, sonreír y disfrutar.',
+            descripcion: '"¡Bienvenidos a nuestra clase de Zumba! Prepárense para disfrutar una hora llena de energía, música y movimientos divertidos. No importa tu nivel, lo importante es moverte, sonreír y disfrutar del poder de hacer ejercicio en compañia de los mejores instructores.',
             imagen: 'src/assets/Zumba.jpg'
         },
         {
@@ -30,7 +30,7 @@ const EmpleadoClases = ()=>{
         },
         {
             nombre: 'Levantamiento de pesas',
-            descripcion: '¡Bienvenidos a nuestra sesión de levantamiento de pesas! Hoy nos enfocaremos en la técnica, la fuerza y el control para alcanzar tus metas. Recuerda escuchar a tu cuerpo, mantener la postura correcta y dar lo mejor de ti.',
+            descripcion: '¡Bienvenidos a nuestra sesión de levantamiento de pesas! Hoy nos enfocaremos en la técnica, la fuerza y el control para alcanzar tus metas. Recuerda escuchar a tu cuerpo, mantener la postura correcta y dar lo mejor.',
             imagen: 'src/assets/Pesas.jpg'
         },
         {
@@ -40,7 +40,7 @@ const EmpleadoClases = ()=>{
         },
         {
             nombre: 'Otros ejercicios',
-            descripcion: 'Proximamente.....',
+            descripcion: '¡Bienvenidos a nuestra clase de cardio! Prepárense para una sesión llena de energía, movimientos dinámicos y mucha diversión. Nuestro objetivo es aumentar el ritmo cardíaco, quemar calorías',
             imagen: 'src/assets/Otro.jpg'
         },
     ];
