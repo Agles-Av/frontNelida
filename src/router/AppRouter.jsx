@@ -23,7 +23,7 @@ export default function AppRouter() {
             case 'ADMIN':
                 return <Route path='/admin' element={<AdminLayout />} />;
             case 'CLIENTE':
-                return <Route path='/usuario' element={<UsuarioLayout />} />;
+                return <Route path='/cliente' element={<UsuarioLayout />} />;
             default:
                 return <Route path='/' element={<LandingPage />} />;
         }
