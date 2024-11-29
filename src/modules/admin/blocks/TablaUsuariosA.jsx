@@ -1,93 +1,264 @@
-import React, { useState } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Avatar } from "primereact/avatar";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
-import { FileUpload } from "primereact/fileupload";
+import React, { useState, useEffect, useRef } from 'react';
+import AxiosClient from '../../../config/http-gateway/http-client';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Avatar } from 'primereact/avatar';
+import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
+import { FileUpload } from 'primereact/fileupload';
+import { Card } from 'primereact/card';
+import { ConfirmPopup } from 'primereact/confirmpopup'; // To use <ConfirmPopup> tag
+import { confirmPopup } from 'primereact/confirmpopup';
+import { Messages } from 'primereact/messages';
+import { Dropdown } from 'primereact/dropdown';
+import * as Yup from 'yup';
+import { Formik } from 'formik';
 
 const TablaUsuarios = () => {
-  const [usuarios, setUsuarios] = useState([
-    {
-      nombre: "Agles",
-      correo: "agles@gmmail.com",
-      telefono: "7305477760",
-      rol: "Cliente",
-      suscripcion: "Six-Pack",
-      avatar: "src/assets/usuario.png",
-    },
-    {
-      nombre: "David",
-      correo: "david@gmmail.com",
-      telefono: "7305477761",
-      rol: "Cliente",
-      suscripcion: "Express",
-      avatar: "src/assets/usuario.png",
-    },
-  ]);
+  const [data, setData] = useState([]); // Datos originales de la API
   const [showDialog, setShowDialog] = useState(false); // Controla la ventana emergente
+  const [roles, setRoles] = useState([]);
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
-    correo: "",
-    telefono: "",
-    rol: "",
-    suscripcion: "",
-    avatar: "",
+      apPaterno:"",
+      apMaterno:"",
+      email: "",
+      edad:"",
+      telefono: "",
+      contrasena: "",
+      foto: null,
+      role: null,
   });
+  const messages = useRef(null); // Usar useRef para la referencia de Messages
+
+  const getRoles = async () => {
+    try {
+      const response = await AxiosClient({
+        url: "/role/",
+        method: "GET",
+      });
+
+      if (!response.error) {
+        setRoles(response.data); // Establecer los roles
+      }
+    } catch (error) {
+      console.error('Error al obtener los roles:', error);
+    }
+  }
+
+  const getDatos = async () => {
+    try {
+      const response = await AxiosClient({
+        url: "/usuario/",
+        method: "GET",
+      });
+
+      if (!response.error) {
+        const usuariosFiltrados = response.data.filter(
+          (usuario) => usuario.role && usuario.role.nombre !== 'ADMIN'
+        );
+        setData(usuariosFiltrados); // Guarda solo los usuarios no admin
+      }
+    } catch (error) {
+      console.error('Error al obtener datos:', error);
+    } finally {
+    }
+  };
+
+  const changeStatus = async (rowData) => {
+    console.log(rowData);
+
+    try {
+      const response = await AxiosClient({
+        url: "/usuario/status/" + rowData.id,
+        method: "PATCH",
+      });
+
+      if (!response.error) {
+        getDatos();
+        messages.current.show({
+          sticky: true,
+          severity: 'success', 
+          summary: 'Éxito', 
+          detail: `El estado de ${rowData.nombre} se ha cambiado correctamente.`,
+          closable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error al obtener datos:', error);
+      // Agregar un mensaje de error si la solicitud falla
+      messages.current.show({
+        severity: 'error', 
+        summary: 'Error', 
+        detail: 'No se pudo cambiar el estado del usuario.',
+      });
+    }
+  };
+
+  useEffect(() => {
+    getDatos();
+    getRoles();
+  }, []);
 
   const avatarBodyTemplate = (rowData) => (
     <Avatar
-      image={rowData.avatar}
+      image={rowData.foto}
       shape="circle"
-      style={{ marginRight: "0.5rem" }}
+      style={{ marginRight: '0.5rem' }}
     />
   );
 
-  const actionsBodyTemplate = () => (
-    <>
-      <Button icon="pi pi-pencil" className="p-button-rounded p-button-text" />
-      <Button icon="pi pi-trash" className="p-button-rounded p-button-text" />
-    </>
-  );
+  const actionsBodyTemplate = (rowData) => {
+    // Función para abrir el popup de confirmación antes de cambiar el estado
+    const handleStatusChange = () => {
+      confirmPopup({
+        target: document.activeElement,
+        message: `¿Estás seguro de que quieres ${rowData.status ? 'desactivar' : 'activar'} al usuario ${rowData.nombre}?`,
+        header: 'Confirmar Acción',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
+        accept: () => changeStatus(rowData),
+        reject: () => {}
+      });
+    };
 
-  const agregarUsuario = () => {
-    setUsuarios([...usuarios, nuevoUsuario]);
-    setNuevoUsuario({
-      nombre: "",
-      correo: "",
-      telefono: "",
-      rol: "",
-      suscripcion: "",
-      avatar: "",
-    });
-    setShowDialog(false); // Cerrar la ventana emergente
+    return (
+      <>
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-rounded p-button-text"
+          onClick={() => console.log('Editar', rowData)}
+        />
+        {rowData.status ? (
+          <Button
+            icon="pi pi-ban" // Icono de desactivar
+            className="p-button-rounded p-button-danger"
+            onClick={handleStatusChange} // Mostrar el popup de confirmación
+          />
+        ) : (
+          /* Si el usuario está inactivo (status === false) */
+          <Button
+            icon="pi pi-check" // Icono de activar
+            className="p-button-rounded p-button-success"
+            onClick={handleStatusChange} // Mostrar el popup de confirmación
+          />
+        )}
+      </>
+    );
   };
 
-  const onUpload = (e) => {
+  // Muestra solo la última suscripción del arreglo
+  const suscripcionBodyTemplate = (rowData) => {
+    const suscripciones = rowData.suscripciones || []; // Asegúrate de que sea un arreglo
+    if (suscripciones.length > 0) {
+      const ultimaSuscripcion = suscripciones[suscripciones.length - 1]; // Toma la última suscripción
+      return ultimaSuscripcion.membresia.nombre; // Devuelve el nombre de la membresía
+    }
+    return 'Sin suscripción'; // Si no hay suscripciones
+  };
+
+  const agregarUsuario = async () => {
+    try {
+      const usuarioConFotoBase64 = {
+        ...nuevoUsuario,
+        //foto: nuevoUsuario.foto ? await convertirImagenBase64(nuevoUsuario.foto) : null, // Convertir a base64
+        role: { id: nuevoUsuario.rol.id }
+      };
+  
+      console.log(usuarioConFotoBase64); // Verifica que la foto esté en Base64
+  
+      const response = await AxiosClient({
+        url: "/usuario/",
+        method: "POST",
+        data: usuarioConFotoBase64, // Enviar los datos con la foto convertida
+      });
+  
+      if (!response.error) {
+        getDatos(); // Actualiza la tabla
+        setNuevoUsuario({
+          nombre: "",
+          apPaterno: "",
+          apMaterno: "",
+          email: "",
+          edad: "",
+          telefono: "",
+          contrasena: "",
+          foto: null,
+          role: null,
+        });
+        setShowDialog(false); // Cierra el diálogo
+        messages.current.show({
+          severity: 'success',
+          summary: 'Usuario agregado',
+          detail: `El usuario ${nuevoUsuario.nombre} fue añadido exitosamente.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error al agregar usuario:', error);
+      messages.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo agregar el usuario.',
+      });
+    }
+  };
+
+  const convertirImagenBase64 = (archivo) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result); // El resultado será un string en base64
+      };
+      reader.onerror = reject; // En caso de error
+      reader.readAsDataURL(archivo); // Convierte la imagen a base64
+    });
+  };
+  
+  const onUpload = async (e) => {
     const file = e.files[0];
-    const imageUrl = URL.createObjectURL(file); // Convertir archivo en URL
-    setNuevoUsuario({ ...nuevoUsuario, avatar: imageUrl });
+  
+    if (file) {
+      try {
+        // Esperar a que la imagen se convierta a base64
+        const coso = await convertirImagenBase64(file);
+        console.log(coso); // Verifica que `coso` ahora contiene el base64
+  
+        // Asignar el valor base64 a la propiedad 'foto'
+        setNuevoUsuario({ ...nuevoUsuario, foto: coso });
+      } catch (error) {
+        console.error("Error al convertir la imagen:", error);
+      }
+    } else {
+      console.error("No se ha seleccionado un archivo");
+    }
   };
 
   return (
-    <div className="card">
+    <Card className='border-transparent shadow-none '>
       <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Usuarios</h1>
+      
+      <Messages ref={messages} />
 
-      {/* Botón para añadir usuario */}
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-  <Button
-    label="Añadir Usuario"
-    icon="pi pi-plus"
-    className="mb-3"
-    onClick={() => setShowDialog(true)}
-  />
-</div>
+        <Button
+          label="Añadir Usuario"
+          icon="pi pi-plus"
+          className="mb-3"
+          onClick={() => setShowDialog(true)}
+        />
+      </div>
 
 
-      {/* Tabla de usuarios */}
-      <DataTable value={usuarios} responsiveLayout="scroll">
+      <DataTable
+        value={data}
+        paginator
+        rows={10}
+        rowsPerPageOptions={[5, 10, 20]}
+        responsiveLayout="scroll"
+      >
         <Column
           header="Nombre"
           field="nombre"
@@ -98,15 +269,19 @@ const TablaUsuarios = () => {
             </div>
           )}
         />
-        <Column header="Correo" field="correo" />
+        <Column header="Correo" field="email" />
         <Column header="Teléfono" field="telefono" />
-        <Column header="Rol" field="rol" />
-        <Column header="Suscripción Actual" field="suscripcion" />
-        <Column body={actionsBodyTemplate} style={{ textAlign: "center" }} />
+        <Column header="Rol" field="role.nombre" />
+        <Column
+          header="Suscripción Actual"
+          body={suscripcionBodyTemplate}
+        />
+        <Column body={actionsBodyTemplate} style={{ textAlign: 'center' }} />
       </DataTable>
 
-      {/* Ventana emergente */}
-      <Dialog 
+      <ConfirmPopup />
+
+      <Dialog
         header="Añadir Nuevo Usuario"
         visible={showDialog}
         style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
@@ -118,19 +293,39 @@ const TablaUsuarios = () => {
             <InputText
               id="nombre"
               value={nuevoUsuario.nombre}
-              onChange={(e) =>
-                setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })
-              }
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })}
             />
           </div>
           <div className="field">
-            <label htmlFor="correo">Correo</label>
+            <label htmlFor="apPaterno">Apellido Paterno</label>
             <InputText
-              id="correo"
-              value={nuevoUsuario.correo}
-              onChange={(e) =>
-                setNuevoUsuario({ ...nuevoUsuario, correo: e.target.value })
-              }
+              id="apPaterno"
+              value={nuevoUsuario.apPaterno}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apPaterno: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="apMaterno">Apellido Materno</label>
+            <InputText
+              id="apMaterno"
+              value={nuevoUsuario.apMaterno}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apMaterno: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <InputText
+              id="email"
+              value={nuevoUsuario.email}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="edad">Edad</label>
+            <InputNumber
+              id="edad"
+              value={nuevoUsuario.edad}
+              onValueChange={(e) => setNuevoUsuario({ ...nuevoUsuario, edad: e.value })}
             />
           </div>
           <div className="field">
@@ -138,55 +333,42 @@ const TablaUsuarios = () => {
             <InputNumber
               id="telefono"
               value={nuevoUsuario.telefono}
-              onChange={(e) =>
-                setNuevoUsuario({ ...nuevoUsuario, telefono: e.value })
-              }
-              useGrouping={false}
+              onValueChange={(e) => setNuevoUsuario({ ...nuevoUsuario, telefono: e.value })}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="contraseña">Contraseña</label>
+            <InputText
+              id="contraseña"
+              type="password"
+              value={nuevoUsuario.contrasena}
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, contrasena: e.target.value })}
             />
           </div>
           <div className="field">
             <label htmlFor="rol">Rol</label>
-            <InputText
+            <Dropdown
               id="rol"
               value={nuevoUsuario.rol}
-              onChange={(e) =>
-                setNuevoUsuario({ ...nuevoUsuario, rol: e.target.value })
-              }
+              options={roles}
+              optionLabel="nombre"
+              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, rol: e.value })}
+              placeholder="Seleccione un rol"
             />
           </div>
           <div className="field">
-            <label htmlFor="suscripcion">Suscripción</label>
-            <InputText
-              id="suscripcion"
-              value={nuevoUsuario.suscripcion}
-              onChange={(e) =>
-                setNuevoUsuario({ ...nuevoUsuario, suscripcion: e.target.value })
-              }
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="avatar">Foto</label>
+            <label htmlFor="foto">Foto</label>
             <FileUpload
               mode="basic"
-              name="avatar"
+              name="file"
               accept="image/*"
-              auto
-              customUpload
-              uploadHandler={onUpload}
-              chooseLabel="Seleccionar Foto"
+              onSelect={onUpload}
             />
           </div>
-        </div>
-        <div className="p-d-flex p-jc-end mt-3">
-          <Button
-            label="Cancelar"
-            className="p-button-text"
-            onClick={() => setShowDialog(false)}
-          />
-          <Button label="Añadir" className="p-button" onClick={agregarUsuario} />
+          <Button label="Guardar" icon="pi pi-save" onClick={agregarUsuario} />
         </div>
       </Dialog>
-    </div>
+    </Card>
   );
 };
 
