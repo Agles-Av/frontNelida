@@ -15,23 +15,28 @@ import { Messages } from 'primereact/messages';
 import { Dropdown } from 'primereact/dropdown';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import CreateUser from './components/CreateUser';
+import EditUser from './components/EditUser';
+import { set } from 'react-hook-form';
 
 const TablaUsuarios = () => {
   const [data, setData] = useState([]); // Datos originales de la API
   const [showDialog, setShowDialog] = useState(false); // Controla la ventana emergente
   const [roles, setRoles] = useState([]);
-  const [nuevoUsuario, setNuevoUsuario] = useState({
-    nombre: "",
-      apPaterno:"",
-      apMaterno:"",
-      email: "",
-      edad:"",
-      telefono: "",
-      contrasena: "",
-      foto: null,
-      role: null,
-  });
   const messages = useRef(null); // Usar useRef para la referencia de Messages
+  const [selectedUser, setSelectedUser] = useState([{
+    id: 0,
+    nombre: '',
+    apPaterno: '',
+    apMaterno: '',
+    email: '',
+    telefono: '',
+    contrasena: '',
+    edad: '',
+    role: '',
+    foto: null,
+  }]);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const getRoles = async () => {
     try {
@@ -80,8 +85,8 @@ const TablaUsuarios = () => {
         getDatos();
         messages.current.show({
           sticky: true,
-          severity: 'success', 
-          summary: 'Éxito', 
+          severity: 'success',
+          summary: 'Éxito',
           detail: `El estado de ${rowData.nombre} se ha cambiado correctamente.`,
           closable: true,
         });
@@ -90,8 +95,8 @@ const TablaUsuarios = () => {
       console.error('Error al obtener datos:', error);
       // Agregar un mensaje de error si la solicitud falla
       messages.current.show({
-        severity: 'error', 
-        summary: 'Error', 
+        severity: 'error',
+        summary: 'Error',
         detail: 'No se pudo cambiar el estado del usuario.',
       });
     }
@@ -121,7 +126,7 @@ const TablaUsuarios = () => {
         acceptLabel: 'Sí',
         rejectLabel: 'No',
         accept: () => changeStatus(rowData),
-        reject: () => {}
+        reject: () => { }
       });
     };
 
@@ -130,7 +135,7 @@ const TablaUsuarios = () => {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-text"
-          onClick={() => console.log('Editar', rowData)}
+          onClick={() => goEdit(rowData)}
         />
         {rowData.status ? (
           <Button
@@ -160,86 +165,15 @@ const TablaUsuarios = () => {
     return 'Sin suscripción'; // Si no hay suscripciones
   };
 
-  const agregarUsuario = async () => {
-    try {
-      const usuarioConFotoBase64 = {
-        ...nuevoUsuario,
-        //foto: nuevoUsuario.foto ? await convertirImagenBase64(nuevoUsuario.foto) : null, // Convertir a base64
-        role: { id: nuevoUsuario.rol.id }
-      };
-  
-      console.log(usuarioConFotoBase64); // Verifica que la foto esté en Base64
-  
-      const response = await AxiosClient({
-        url: "/usuario/",
-        method: "POST",
-        data: usuarioConFotoBase64, // Enviar los datos con la foto convertida
-      });
-  
-      if (!response.error) {
-        getDatos(); // Actualiza la tabla
-        setNuevoUsuario({
-          nombre: "",
-          apPaterno: "",
-          apMaterno: "",
-          email: "",
-          edad: "",
-          telefono: "",
-          contrasena: "",
-          foto: null,
-          role: null,
-        });
-        setShowDialog(false); // Cierra el diálogo
-        messages.current.show({
-          severity: 'success',
-          summary: 'Usuario agregado',
-          detail: `El usuario ${nuevoUsuario.nombre} fue añadido exitosamente.`,
-        });
-      }
-    } catch (error) {
-      console.error('Error al agregar usuario:', error);
-      messages.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo agregar el usuario.',
-      });
-    }
-  };
-
-  const convertirImagenBase64 = (archivo) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result); // El resultado será un string en base64
-      };
-      reader.onerror = reject; // En caso de error
-      reader.readAsDataURL(archivo); // Convierte la imagen a base64
-    });
-  };
-  
-  const onUpload = async (e) => {
-    const file = e.files[0];
-  
-    if (file) {
-      try {
-        // Esperar a que la imagen se convierta a base64
-        const coso = await convertirImagenBase64(file);
-        console.log(coso); // Verifica que `coso` ahora contiene el base64
-  
-        // Asignar el valor base64 a la propiedad 'foto'
-        setNuevoUsuario({ ...nuevoUsuario, foto: coso });
-      } catch (error) {
-        console.error("Error al convertir la imagen:", error);
-      }
-    } else {
-      console.error("No se ha seleccionado un archivo");
-    }
+  const goEdit = (rowData) => {
+    setSelectedUser(rowData);
+    setShowEditDialog(true);
   };
 
   return (
     <Card className='border-transparent shadow-none '>
       <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Usuarios</h1>
-      
+
       <Messages ref={messages} />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -279,95 +213,22 @@ const TablaUsuarios = () => {
         <Column body={actionsBodyTemplate} style={{ textAlign: 'center' }} />
       </DataTable>
 
-      <ConfirmPopup />
-
-      <Dialog
-        header="Añadir Nuevo Usuario"
-        visible={showDialog}
-        style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+      <CreateUser
+        abrir={showDialog}
         onHide={() => setShowDialog(false)}
-      >
-        <div className="p-fluid">
-          <div className="field">
-            <label htmlFor="nombre">Nombre</label>
-            <InputText
-              id="nombre"
-              value={nuevoUsuario.nombre}
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="apPaterno">Apellido Paterno</label>
-            <InputText
-              id="apPaterno"
-              value={nuevoUsuario.apPaterno}
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apPaterno: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="apMaterno">Apellido Materno</label>
-            <InputText
-              id="apMaterno"
-              value={nuevoUsuario.apMaterno}
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apMaterno: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="email">Email</label>
-            <InputText
-              id="email"
-              value={nuevoUsuario.email}
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="edad">Edad</label>
-            <InputNumber
-              id="edad"
-              value={nuevoUsuario.edad}
-              onValueChange={(e) => setNuevoUsuario({ ...nuevoUsuario, edad: e.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="telefono">Teléfono</label>
-            <InputNumber
-              id="telefono"
-              value={nuevoUsuario.telefono}
-              onValueChange={(e) => setNuevoUsuario({ ...nuevoUsuario, telefono: e.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="contraseña">Contraseña</label>
-            <InputText
-              id="contraseña"
-              type="password"
-              value={nuevoUsuario.contrasena}
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, contrasena: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="rol">Rol</label>
-            <Dropdown
-              id="rol"
-              value={nuevoUsuario.rol}
-              options={roles}
-              optionLabel="nombre"
-              onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, rol: e.value })}
-              placeholder="Seleccione un rol"
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="foto">Foto</label>
-            <FileUpload
-              mode="basic"
-              name="file"
-              accept="image/*"
-              onSelect={onUpload}
-            />
-          </div>
-          <Button label="Guardar" icon="pi pi-save" onClick={agregarUsuario} />
-        </div>
-      </Dialog>
+        getUser={getDatos}
+        messages={messages}
+      />
+      <EditUser
+        abrir={showEditDialog}
+        onHide={() => setShowEditDialog(false)}
+        getUser={getDatos}
+        messages={messages}
+        dataUser={selectedUser}
+        roles={roles}
+      />
+
+      <ConfirmPopup />
     </Card>
   );
 };
