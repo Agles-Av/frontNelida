@@ -5,11 +5,13 @@ import { Avatar } from 'primereact/avatar';
 import { scroller } from 'react-scroll';
 import { useTheme } from '../../context/ThemeContext';
 import LoggOutButton from '../../components/LoggOutButton';
+import AxiosCLient from '../../config/http-gateway/http-client';
 
 const AdminLayout = () => {
   const [visible, setVisible] = useState(false); // Estado para la visibilidad del modal
   const [visibleR, setVisibleR] = useState(false); // Estado para la visibilidad del modal
   const { toggleTheme } = useTheme();
+  
 
   const items = [
     {

@@ -18,11 +18,11 @@ const AdminPage = () => {
                     <div id='Carrusel'>
                         <Carrusel />
                     </div>
-                    <div id='Usuarios'>
-                        <TablaUsuarios />
-                    </div>
                     <div id='Finanzas'>
                         <Finanzas />
+                    </div>
+                    <div id='Usuarios'>
+                        <TablaUsuarios />
                     </div>
                     <div id='membresias'>
                         <Membresias />
