@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 
 const Clases = () => {
     const [clases, setClases] = useState([]);
@@ -13,17 +14,12 @@ const Clases = () => {
     const [email, setEmail] = useState('');
     const [fecha, setFecha] = useState(new Date());
     const [showDialog, setShowDialog] = useState(false);
+    const toast = useRef(null);
 
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
-
-    // Obtener datos del usuario desde localStorage
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user?.token;
     const userId = user?.userId.id;
-    console.log('User:', user.userId.id);
-    console.log('Email', user.userId.email);
-    
-    
 
     useEffect(() => {
         if (!token) {
@@ -55,20 +51,20 @@ const Clases = () => {
 
     const handleConfirm = async () => {
         if (!selectedClass || !selectedClass.id) {
-            alert('Por favor, selecciona una clase válida.');
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Selecciona una clase válida.', life: 3000 });
             return;
         }
         if (!userId) {
-            alert('Usuario no válido. Por favor, inicia sesión nuevamente.');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Usuario no válido. Por favor, inicia sesión nuevamente.', life: 3000 });
             return;
         }
         if (!fecha) {
-            alert('Por favor selecciona una fecha antes de confirmar.');
+            toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Selecciona una fecha.', life: 3000 });
             return;
         }
 
         const payload = {
-            userId: userId, // ID del usuario desde localStorage
+            userId: userId,
         };
 
         try {
@@ -79,23 +75,19 @@ const Clases = () => {
                 },
             });
 
-            alert('¡Suscripción exitosa!');
+            toast.current.show({ severity: 'success', summary: 'Éxito', detail: '¡Suscripción exitosa!', life: 3000 });
         } catch (error) {
             if (error.response) {
-                console.error('Error response:', error.response);
-                if (error.response.status === 400) {
-                    alert('Datos inválidos. Revisa la información enviada.');
-                } else if (error.response.status === 401) {
-                    alert('No autorizado. Por favor, inicia sesión nuevamente.');
+                const { status } = error.response;
+                if (status === 400) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos inválidos.', life: 3000 });
+                } else if (status === 401) {
+                    toast.current.show({ severity: 'error', summary: 'No autorizado', detail: 'Inicia sesión nuevamente.', life: 3000 });
                 } else {
-                    alert('Error del servidor. Intenta más tarde.');
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error del servidor. Intenta más tarde.', life: 3000 });
                 }
-            } else if (error.request) {
-                console.error('Error request:', error.request);
-                alert('No se pudo conectar al servidor. Verifica tu conexión.');
             } else {
-                console.error('Error general:', error.message);
-                alert('Error desconocido. Intenta nuevamente.');
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo conectar al servidor.', life: 3000 });
             }
         } finally {
             setShowDialog(false);
@@ -116,6 +108,7 @@ const Clases = () => {
 
     return (
         <div className="w-full mt-5">
+            <Toast ref={toast} />
             <Card className="border-transparent shadow-none">
                 <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases</h1>
                 <div className="grid">
@@ -133,7 +126,7 @@ const Clases = () => {
                                 }
                             >
                                 <img
-                                    src={clase.foto.length >5 || 'src/assets/Cardio.jpg'}
+                                    src={clase.foto.length > 5 || 'src/assets/Cardio.jpg'}
                                     alt={clase.nombre}
                                     className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
                                 />
