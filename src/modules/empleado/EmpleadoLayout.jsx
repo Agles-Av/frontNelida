@@ -1,11 +1,11 @@
 import React from 'react';
-import EmpleadoLandingPage from './EmpleadoLandingPage'
-import CarruselEmpleado from './CarruselEmpleado';
-import TablaUsuarios from './TablaUsuarios';
-import SPA from './SPA';
-import EmpleadoFooter from './EmpleadoFooter';
-import EmpleadoClases from './EmpleadoClases';
-import PromocionesEmpleado from './PromocionesEmpleado';
+import EmpleadoLandingPage from './Componentes/EmpleadoLandingPage'
+import CarruselEmpleado from './Componentes/CarruselEmpleado';
+import TablaUsuarios from './Componentes/TablaUsuarios';
+import SPA from './Componentes/SPA';
+import EmpleadoFooter from './Componentes/EmpleadoFooter';
+import EmpleadoClases from './Componentes/EmpleadoClases';
+import PromocionesEmpleado from './Componentes/PromocionesEmpleado';
 
 
 const EmpleadoLayout = () => {

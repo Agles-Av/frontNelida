@@ -1,9 +1,9 @@
 import React from 'react'
-import LandingLayout from './LandingLayout'
-import Carrusel from './Carrusel'
-import Membresias from './Membresias'
-import Clases from './Clases'
-import LandingFooter from './LandingFooter'
+import LandingLayout from './ULandingLayout'
+import Carrusel from './UCarrusel'
+import Membresias from './UMembresias'
+import Clases from './UClases'
+import LandingFooter from './ULandingFooter'
 
 
 const LandingPage = () => {

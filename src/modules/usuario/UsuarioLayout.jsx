@@ -1,10 +1,12 @@
 import React from 'react'
-import Carrusel from './Componentes/Carrusel'
-import Membresias from './Componentes/Membresias'
-import Clases from './Componentes/Clases'
-import LandingFooter from './Componentes/LandingFooter'
-import LandingLayout from './Componentes/LandingLayout'
-import LandingPage from './Componentes/LandingPage'
+import Carrusel from './Componentes/UCarrusel'
+import Membresias from './Componentes/UMembresias'
+import Clases from './Componentes/UClases'
+import LandingFooter from './Componentes/ULandingFooter'
+import LandingLayout from './Componentes/ULandingLayout'
+import ClasesSuscritas from './Componentes/UClasesSuscritas'
+import OfertasMembresias from './Componentes/ofertaMembresias'
+import LandingPage from './Componentes/ULandingPage'
 
 const UsuarioLayout = () => {
   return (
@@ -17,8 +19,14 @@ const UsuarioLayout = () => {
                 <div id='membresias'>
                     <Membresias />
                 </div>
+                <div id='clasesSuscritas'>
+                    <ClasesSuscritas />
+                </div>
                 <div id='Clases'>
                     <Clases />
+                </div>
+                <div id='Ofertas'>
+                    <OfertasMembresias />
                 </div>
             </div>
             <div id='footer'>

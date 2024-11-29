@@ -17,9 +17,9 @@ const SPA = () =>{
             {/* Contenido a la derecha */}
             <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Conoce los beneficios del Spa</h1>
-                <descripcion className="text-1xl font-semibold text-left mb-4 text-primary">
-                    Body text for your whole article or post. We'll put in some lorem ipsum to show how a filled-out page might look. Body text for your whole article or postsafhkjashdjkfkjdshfjkhasdjfkhsjkadfjfd.
-                </descripcion>
+                <h3 className="text-1xl font-semibold text-left mb-4 text-primary">
+                Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look:Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look:Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look:Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look:Body text for your whole article or post. We’ll put in some lorem ipsum to show how a filled-out page might look:
+                </h3>
                 <Button
                     label="Agendar lugar"
                     icon="pi pi-calendar"
