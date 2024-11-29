@@ -16,7 +16,7 @@ const LandingPage = () => {
                     <Carrusel />
                 </div>
                 <div id='membresias'>
-                    <Membresias />
+                    <Membresias register={true} />
                 </div>
                 <div id='Clases'>
                     <Clases />
