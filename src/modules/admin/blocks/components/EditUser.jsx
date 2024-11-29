@@ -20,7 +20,6 @@ const EditUser = ({ abrir, onHide, getUser, messages, dataUser }) => {
             setSelectedRole(dataUser.role); // Asignamos el rol del usuario
         }
     }, [dataUser]);
-    console.log(selectedRole);
     
 
     const getRoles = async () => {
@@ -75,7 +74,6 @@ const EditUser = ({ abrir, onHide, getUser, messages, dataUser }) => {
         if (file) {
             try {
                 const coso = await convertirImagenBase64(file);
-                console.log(coso);
                 setFieldValue({ ...initialValues, foto: coso });
             } catch (error) {
                 console.error("Error al convertir la imagen:", error);
@@ -87,7 +85,6 @@ const EditUser = ({ abrir, onHide, getUser, messages, dataUser }) => {
 
     const handleSubmit = async (values) => {
         try {
-            console.log("Formulario enviado:", values);
             if (values.foto === null) {
                 values.foto = dataUser.foto;
             }
@@ -143,12 +140,6 @@ const EditUser = ({ abrir, onHide, getUser, messages, dataUser }) => {
         telefono: Yup.string()
             .required('El teléfono es obligatorio')
             .matches(/^\d{10}$/, 'El teléfono debe tener 10 dígitos'),
-        contrasena: Yup.string()
-            .required('La contraseña es obligatoria')
-            .min(6, 'La contraseña debe tener al menos 6 caracteres'),
-        contrasenaRepetir: Yup.string()
-            .required('La contraseña es obligatoria')
-            .oneOf([Yup.ref('contrasena'), null], 'Las contraseñas deben coincidir'),
         edad: Yup.number()
             .required('La edad es obligatoria')
             .min(18, 'Debes ser mayor de 18 años'),
@@ -241,34 +232,6 @@ const EditUser = ({ abrir, onHide, getUser, messages, dataUser }) => {
                                             <label htmlFor="email">Email</label>
                                         </FloatLabel>
                                         <ErrorMessage name="email" component="small" className="p-error" />
-                                    </div>
-                                    {/* Contraseña */}
-                                    <div className="col-4 mt-4">
-                                        <FloatLabel>
-                                            <Field
-                                                name="contrasena"
-                                                as={InputText}
-                                                id="contrasena"
-                                                type="password"
-                                                maxLength="16"
-                                            />
-                                            <label htmlFor="contrasena">Contraseña</label>
-                                        </FloatLabel>
-                                        <ErrorMessage name="contrasena" component="small" className="p-error" />
-                                    </div>
-                                    {/* Contraseña repetir */}
-                                    <div className="col-4 mt-4">
-                                        <FloatLabel>
-                                            <Field
-                                                name="contrasenaRepetir"
-                                                as={InputText}
-                                                id="contrasenaRepetir"
-                                                type="password"
-                                                maxLength="16"
-                                            />
-                                            <label htmlFor="contrasenaRepetir">Confirma la contraseña</label>
-                                        </FloatLabel>
-                                        <ErrorMessage name="contrasenaRepetir" component="small" className="p-error" />
                                     </div>
                                     {/* Edad */}
                                     <div className="col-4 mt-4">
