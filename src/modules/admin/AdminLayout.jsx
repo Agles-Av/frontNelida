@@ -10,6 +10,8 @@ import AxiosCLient from '../../config/http-gateway/http-client';
 const AdminLayout = () => {
   const [visible, setVisible] = useState(false); // Estado para la visibilidad del modal
   const [visibleR, setVisibleR] = useState(false); // Estado para la visibilidad del modal
+
+  
   const { toggleTheme } = useTheme();
   const user = JSON.parse(localStorage.getItem('user'));
   const userName = user?.userId?.nombre || 'Usuario';
