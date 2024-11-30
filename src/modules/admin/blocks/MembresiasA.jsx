@@ -105,7 +105,7 @@ const Membresias = () => {
         };
 
         return (
-            <>
+            <div className='flex justify-content-between'>
                 <Button
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-text"
@@ -125,7 +125,7 @@ const Membresias = () => {
                         onClick={handleStatusChange} // Mostrar el popup de confirmación
                     />
                 )}
-            </>
+            </div>
         );
     };
 
