@@ -9,9 +9,10 @@ import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
 const Membresias = () => {
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState('monthly'); // Default mensual
     const [membresias, setMembresias] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isAnnual, setIsAnnual] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
@@ -24,32 +25,31 @@ const Membresias = () => {
     const toast = React.useRef(null);
 
     const items = [
-        { name: 'Anual', value: 1 },
-        { name: 'Mensual', value: 3 },
+        { name: 'Anual', value: 'annual' },
+        { name: 'Mensual', value: 'monthly' },
     ];
 
-    // Obtener datos del usuario desde localStorage
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user?.token;
-
-    // Obtener la membresía actual
     const suscripciones = user?.userId.suscripciones || [];
     const membresiaActual = suscripciones.length
         ? suscripciones.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))[0]?.membresia.nombre
         : 'Sin membresía activa';
 
-    // URL base desde .env
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
 
     useEffect(() => {
         const fetchMembresias = async () => {
             try {
                 const response = await axios.get(`${BASE_URL}/membresia/`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
-                setMembresias(response.data.data);
+                // Guardar precioBase para cálculos
+                const membresiasConPrecioBase = response.data.data.map((membresia) => ({
+                    ...membresia,
+                    precioBase: membresia.precioOriginal,
+                }));
+                setMembresias(membresiasConPrecioBase);
             } catch (error) {
                 console.error('Error fetching membresías:', error);
             } finally {
@@ -59,6 +59,19 @@ const Membresias = () => {
 
         fetchMembresias();
     }, [BASE_URL, token]);
+
+    const handlePriceChange = (type) => {
+        setIsAnnual(type === 'annual');
+        setMembresias((prevMembresias) =>
+            prevMembresias.map((membresia) => ({
+                ...membresia,
+                precioOriginal:
+                    type === 'annual'
+                        ? membresia.precioBase * 12 // Cálculo anual
+                        : membresia.precioBase, // Regreso al precio base mensual
+            }))
+        );
+    };
 
     const handleSuscribirse = (membresiaNueva) => {
         setFormData({
@@ -88,14 +101,9 @@ const Membresias = () => {
                     status: true,
                     precio: formData.precioNueva,
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // Actualizar membresía en localStorage
             const updatedUser = {
                 ...user,
                 userId: {
@@ -118,6 +126,11 @@ const Membresias = () => {
             });
 
             setShowForm(false);
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+
         } catch (error) {
             console.error('Error actualizando la membresía:', error);
             toast.current.show({
@@ -136,18 +149,17 @@ const Membresias = () => {
     return (
         <div className="card flex flex-column align-items-center">
             <Toast ref={toast} />
-
-            {/* Selector de membresías */}
             <div className="shadow-4 mt-4">
                 <SelectButton
                     value={value}
-                    onChange={(e) => setValue(e.value)}
+                    onChange={(e) => {
+                        setValue(e.value);
+                        handlePriceChange(e.value);
+                    }}
                     optionLabel="name"
                     options={items}
                 />
             </div>
-
-            {/* Listado de membresías */}
             <div className="mt-3 w-full text-center">
                 <div className="grid">
                     {membresias.map((membresia, index) => (
@@ -170,8 +182,6 @@ const Membresias = () => {
                     ))}
                 </div>
             </div>
-
-            {/* Formulario de actualización */}
             <Dialog
                 header="Actualizar Membresía"
                 visible={showForm}

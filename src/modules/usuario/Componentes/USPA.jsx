@@ -7,7 +7,7 @@ import { Calendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
-const Clases = () => {
+const SPA = () => {
     const [clases, setClases] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedClass, setSelectedClass] = useState(null);
@@ -26,6 +26,7 @@ const Clases = () => {
             console.error('No token found in localStorage');
             return;
         }
+
         const fetchClases = async () => {
             try {
                 const response = await axios.get(`${BASE_URL}/clase/`, {
@@ -33,17 +34,14 @@ const Clases = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                // Excluye las clases con el nombre "Spa"
-                const filteredClases = response.data.data.filter(
-                    (clase) => clase.nombre.toLowerCase() !== 'spa'
-                );
-                setClases(filteredClases);
+                setClases(response.data.data);
             } catch (error) {
                 console.error('Error fetching clases:', error);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchClases();
     }, [BASE_URL, token]);
 
@@ -58,10 +56,12 @@ const Clases = () => {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Selecciona una clase válida.', life: 3000 });
             return;
         }
+
         if (!userId) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Usuario no válido. Por favor, inicia sesión nuevamente.', life: 3000 });
             return;
         }
+
         if (!fecha) {
             toast.current.show({ severity: 'warn', summary: 'Advertencia', detail: 'Selecciona una fecha.', life: 3000 });
             return;
@@ -81,22 +81,18 @@ const Clases = () => {
 
             toast.current.show({ severity: 'success', summary: 'Éxito', detail: '¡Suscripción exitosa!', life: 3000 });
 
-            // Recargar la página después de una breve pausa para mostrar el mensaje de éxito
+            // Recargar la página después de un breve retraso
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
         } catch (error) {
-            if (error.response) {
-                const { status } = error.response;
-                if (status === 400) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos inválidos.', life: 3000 });
-                } else if (status === 401) {
-                    toast.current.show({ severity: 'error', summary: 'No autorizado', detail: 'Inicia sesión nuevamente.', life: 3000 });
-                } else {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error del servidor. Intenta más tarde.', life: 3000 });
-                }
+            const { status } = error.response || {};
+            if (status === 400) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos inválidos.', life: 3000 });
+            } else if (status === 401) {
+                toast.current.show({ severity: 'error', summary: 'No autorizado', detail: 'Inicia sesión nuevamente.', life: 3000 });
             } else {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo conectar al servidor.', life: 3000 });
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error del servidor. Intenta más tarde.', life: 3000 });
             }
         } finally {
             setShowDialog(false);
@@ -115,33 +111,39 @@ const Clases = () => {
         return <div>Loading...</div>;
     }
 
+    const spaClases = clases.filter((clase) => clase.nombre.toLowerCase() === 'spa');
+
     return (
         <div className="w-full mt-5">
             <Toast ref={toast} />
             <Card className="border-transparent shadow-none">
-                <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases</h1>
+                <h1 className="text-6xl font-semibold text-left mb-4 text-primary">SPA</h1>
                 <div className="grid">
-                    {clases.map((clase, index) => (
-                        <div key={index} className="col-12 md:col-4 mt-2">
-                            <Card
-                                title={clase.nombre}
-                                footer={
-                                    <Button
-                                        label="Suscríbete"
-                                        icon="pi pi-arrow-right"
-                                        onClick={() => handleSuscribirse(clase)}
+                    {spaClases.length > 0 ? (
+                        spaClases.map((clase, index) => (
+                            <div key={index} className="col-12 md:col-4 mt-2">
+                                <Card
+                                    title={clase.nombre}
+                                    footer={
+                                        <Button
+                                            label="Suscríbete"
+                                            icon="pi pi-arrow-right"
+                                            onClick={() => handleSuscribirse(clase)}
+                                        />
+                                    }
+                                >
+                                    <img
+                                        src={clase.foto.length > 5 || 'src/assets/Spa.jpg'}
+                                        alt={clase.nombre}
+                                        className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
                                     />
-                                }
-                            >
-                                <img
-                                    src={clase.foto}
-                                    alt={clase.nombre}
-                                    className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
-                                />
-                                <p>{clase.descripcion}</p>
-                            </Card>
-                        </div>
-                    ))}
+                                    <p>{clase.descripcion}</p>
+                                </Card>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No hay clases disponibles en la categoría SPA en este momento.</p>
+                    )}
                 </div>
             </Card>
 
@@ -181,4 +183,4 @@ const Clases = () => {
     );
 };
 
-export default Clases;
+export default SPA;
