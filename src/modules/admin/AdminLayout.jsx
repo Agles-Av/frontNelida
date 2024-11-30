@@ -11,6 +11,10 @@ const AdminLayout = () => {
   const [visible, setVisible] = useState(false); // Estado para la visibilidad del modal
   const [visibleR, setVisibleR] = useState(false); // Estado para la visibilidad del modal
   const { toggleTheme } = useTheme();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userName = user?.userId?.nombre || 'Usuario';
+  const userPhoto = user?.userId?.foto || null; // Suponiendo que la foto está en este campo
+  const userROL = user?.userId?.role.nombre || null; // Suponiendo que la foto está en este campo
   
 
   const items = [
@@ -72,7 +76,15 @@ const AdminLayout = () => {
       </div>
   );
 
-  const start = <Avatar image="src/assets/logo.png" size="xlarge" />;
+  const start = (
+    <div className="flex align-items-center gap-3">
+        <Avatar image={userPhoto || 'src/assets/default-avatar.png'} size="large" shape="circle" />
+        <div>
+            <h4 className="m-0">{userName}</h4>
+            <p className="m-0 text-sm text-secondary">{userROL}</p>
+        </div>
+    </div>
+);
 
   return (
       <div className="card shadow-1">
