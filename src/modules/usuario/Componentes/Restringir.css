@@ -1,0 +1,30 @@
+.restricted-wrapper {
+    position: relative;
+}
+
+.restricted-content {
+    position: relative;
+    z-index: 1;
+}
+
+.restricted-content.blurred {
+    filter: blur(4px);
+    opacity: 0.5; /* Ajusta para que sea más evidente el difuminado */
+    pointer-events: none; /* Evita interacciones */
+}
+
+.overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8); /* Asegura un buen contraste */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 2;
+    pointer-events: auto; /* Permite interacción solo con el mensaje */
+    font-size: 16px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
