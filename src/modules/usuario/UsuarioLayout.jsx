@@ -16,10 +16,10 @@ const UsuarioLayout = () => {
                 <div id='Carrusel'>
                     <Carrusel />
                 </div>
-                <div id='membresias'>
+                <div id='Membresias'>
                     <Membresias />
                 </div>
-                <div id='clasesSuscritas'>
+                <div id='TusClases'>
                     <ClasesSuscritas />
                 </div>
                 <div id='Clases'>

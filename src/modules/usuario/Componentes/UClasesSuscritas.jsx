@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 const ClasesSuscritas = () => {
     const [clasesSuscritas, setClasesSuscritas] = useState([]);
@@ -9,6 +11,7 @@ const ClasesSuscritas = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user?.token;
     const userId = user?.userId.id;
+    const toast = useRef(null);
 
     useEffect(() => {
         const fetchSuscripciones = async () => {
@@ -26,6 +29,18 @@ const ClasesSuscritas = () => {
         fetchSuscripciones();
     }, [BASE_URL, userId, token]);
 
+    const confirmEliminar = (claseId) => {
+        confirmDialog({
+            message: '¿Seguro que desea desuscribirse de esta clase?',
+            header: 'Confirmar',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => handleEliminar(claseId),
+            reject: () => {
+                toast.current.show({ severity: 'info', summary: 'Cancelado', detail: 'No se eliminó la clase', life: 3000 });
+            },
+        });
+    };
+
     const handleEliminar = async (claseId) => {
         try {
             await axios.patch(`${BASE_URL}/clase/delPart/${claseId}`, { userId }, {
@@ -34,15 +49,17 @@ const ClasesSuscritas = () => {
                 },
             });
             setClasesSuscritas((prev) => prev.filter((clase) => clase.id !== claseId));
-            alert('Clase eliminada correctamente');
+            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Clase eliminada correctamente', life: 3000 });
         } catch (error) {
             console.error('Error al eliminar la suscripción:', error);
-            alert('Error al eliminar la clase. Inténtalo nuevamente.');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al eliminar la clase. Inténtalo nuevamente.', life: 3000 });
         }
     };
 
     return (
         <div className="w-full mt-5">
+            <Toast ref={toast} />
+            <ConfirmDialog />
             <Card className="border-transparent shadow-none">
                 <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Mis Clases Suscritas</h1>
                 {clasesSuscritas.length === 0 ? (
@@ -54,14 +71,15 @@ const ClasesSuscritas = () => {
                                 <Card
                                     title={clase.nombre}
                                     subTitle={`Instructor: ${clase.instructor || 'No especificado'}`}
-                                    footer={
-                                        <Button
-                                            icon="pi pi-trash"
-                                            className="p-button-danger"
-                                            onClick={() => handleEliminar(clase.id)}
-                                        />
-                                    }
+                                    className="relative"
                                 >
+                                    {/* Botón en la esquina superior derecha más grande */}
+                                    <Button
+                                        icon="pi pi-trash"
+                                        className="p-button-danger absolute top-0 right-0 m-3 text-lg"
+                                        style={{ width: '3rem', height: '3rem' }}
+                                        onClick={() => confirmEliminar(clase.id)}
+                                    />
                                     <img
                                         src={clase.foto && clase.foto.length > 5 ? clase.foto : 'src/assets/Cardio.jpg'}
                                         alt={clase.nombre}
