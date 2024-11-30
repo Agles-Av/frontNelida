@@ -185,7 +185,6 @@ const TablaUsuarios = () => {
         />
       </div>
 
-
       <DataTable
         value={data}
         paginator

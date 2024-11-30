@@ -12,51 +12,66 @@ import AxiosCLient from '../../../../config/http-gateway/http-client';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
 
-
-const EditMem = ({ abrir, onHide, getData, messages, dataUser }) => {
-
-    const stepperRef = useRef(null);
-    const [descripcion, setDescripcion] = useState('');
-    useEffect(() => {
-        setDescripcion(dataUser.descripcion);
-    }, [dataUser]);
+const CreateClass = ({ abrir, onHide, getData, messages }) => {
 
     const initialValues = {
-        nombre: dataUser.nombre,
-        descripcion: dataUser.descripcion,
-        precio: dataUser.precio,
-        promos: dataUser.promos,
-        status: dataUser.status
+        nombre: '',
+        descripcion: '',
+        status: true,
+        foto: null,
+    };
+
+    const convertirImagenBase64 = (archivo) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                resolve(reader.result);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(archivo);
+        });
+    };
+
+    const onUpload = async (e) => {
+        const file = e.files[0];
+        if (file) {
+            try {
+                const coso = await convertirImagenBase64(file);
+                console.log(coso);
+                setFieldValue({ ...initialValues, foto: coso });
+            } catch (error) {
+                console.error("Error al convertir la imagen:", error);
+            }
+        } else {
+            console.error("No se ha seleccionado un archivo");
+        }
     };
 
     const handleSubmit = async (values) => {
-        values.descripcion = descripcion;
         try {
             const response = await AxiosCLient({
-                url: "/membresia/" + dataUser.id,
-                method: "PUT",
+                url: "/clase/",
+                method: "POST",
                 data: values,
             });
 
             if (!response.error) {
-                console.log("Membresia editada con éxito:", response.data);
-
                 getData();
                 messages.current.show({
                     sticky: true,
                     severity: 'success',
                     summary: 'Éxito',
-                    detail: `Se ha editado la membresia con éxito`,
+                    detail: `Se ha creado la clase con éxito`,
                     closable: true,
                 });
                 onHide();
             } else {
-                console.error("Error al crear usuario:", response.error);
+                console.error("Error al crear clase:", response.error);
                 messages.current.show({
                     sticky: true,
                     severity: 'error',
                     summary: 'Error',
-                    detail: `Error al editar la membresia`,
+                    detail: `Error al crear el usuario`,
                     closable: true,
                 });
             }
@@ -73,15 +88,13 @@ const EditMem = ({ abrir, onHide, getData, messages, dataUser }) => {
         descripcion: Yup.string()
             .required('El apellido paterno es obligatorio')
             .max(500, 'El apellido no puede tener más de 255 caracteres'),
-        precio: Yup.number()
-            .required('La edad es obligatoria')
     });
 
 
     return (
         <div className="card flex justify-content-center">
             <Dialog
-                header="Actualizar membresia"
+                header="Registrar Clase"
                 visible={abrir}
                 maximizable
                 style={{ width: '40vw' }}
@@ -108,46 +121,49 @@ const EditMem = ({ abrir, onHide, getData, messages, dataUser }) => {
                                         </FloatLabel>
                                         <ErrorMessage name="nombre" component="small" className="p-error" />
                                     </div>
-                                    {/* Apellido Materno */}
+                                    {/* Apellido Paterno */}
                                     <div className="col-6">
                                         <FloatLabel>
                                             <Field
-                                                name="precio"
-                                                as={InputText}
-                                                id="precio"
-                                                type="number"
-                                                onInput={(e) => {
-                                                    if (e.target.value.length > 3) {
-                                                        e.target.value = e.target.value.slice(0, 3); // Limitar a 3 caracteres
-                                                    }
-                                                }}
-                                            />
-                                            <label htmlFor="precio">Precio Original</label>
-                                        </FloatLabel>
-                                        <ErrorMessage name="precio" component="small" className="p-error" />
-                                    </div>
-                                    {/* Apellido Materno */}
-                                    <div className="col-6  mt-4">
-                                        <FloatLabel>
-                                            <InputTextarea
                                                 name="descripcion"
                                                 as={InputTextarea}
-                                                value={descripcion}
-                                                onChange={(e) => setDescripcion(e.target.value)}
                                                 id="descripcion"
-                                                maxLength="255"
-                                                cols={30}
+                                                maxLength="45"
                                             />
                                             <label htmlFor="descripcion">Descripcion</label>
                                         </FloatLabel>
                                         <ErrorMessage name="descripcion" component="small" className="p-error" />
                                     </div>
+
+                                    <div className="col-3">
+                                        <label htmlFor="foto" className="p-label text-left">
+                                            Sube tu foto
+                                        </label>
+                                        <FileUpload
+                                            mode="basic"
+                                            name="file"
+                                            accept="image/*"
+                                            onSelect={(e) => {
+                                                const file = e.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = () => {
+                                                        // Aquí replicamos el comportamiento que usas en los inputs
+                                                        values.foto = reader.result;
+                                                        // Adicionalmente puedes realizar validaciones si es necesario
+                                                    };
+                                                    reader.onerror = () => console.error("Error al leer el archivo");
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                        <ErrorMessage name="foto" component="small" className="p-error" />
+                                    </div>
                                 </div>
                             </div>
-
                             <div className="flex pt-4 justify-content-between">
                                 <Button
-                                    label="Actualizar"
+                                    label="Registrar"
                                     icon="pi pi-check"
                                     iconPos="right"
                                     type="submit"
@@ -164,4 +180,4 @@ const EditMem = ({ abrir, onHide, getData, messages, dataUser }) => {
     )
 }
 
-export default EditMem
+export default CreateClass
