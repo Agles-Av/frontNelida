@@ -1,72 +1,168 @@
-import React from 'react';
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Card } from "primereact/card";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { Calendar } from "primereact/calendar";
+import { InputText } from "primereact/inputtext";
 
 
 
 const EmpleadoClases = ()=>{
-    const footer = (
-        <>
-            <Button label="Inscribete" icon="pi pi-arrow-right" />
-        </>
-    );
+    const [clases, setClases] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedClase, setSelectedClase] = useState(null);
+    const [showDialog, setShowDialog] = useState(false);
+    const [fecha, setFecha] = useState(new Date());
+    const [email, setEmail] = useState("");
 
-    const clases = [
-        {
-            nombre: 'Zumba',
-            descripcion: '"¡Bienvenidos a nuestra clase de Zumba! Prepárense para disfrutar una hora llena de energía, música y movimientos divertidos. No importa tu nivel, lo importante es moverte, sonreír y disfrutar del poder de hacer ejercicio en compañia de los mejores instructores.',
-            imagen: 'src/assets/Zumba.jpg'
-        },
-        {
-            nombre: 'Yoga',
-            descripcion: 'Bienvenidos a nuestra clase de yoga! Este es un espacio para conectar contigo mismo, relajar la mente y fortalecer el cuerpo. Respira profundamente, suelta las tensiones y prepárate para encontrar equilibrio y tranquilidad.',
-            imagen: 'src/assets/Yoga.jpg'
-        },
-        {
-            nombre: 'GAP',
-            descripcion: '¡Bienvenidos a nuestra clase de GAP! Hoy trabajaremos glúteos, abdominales y piernas con ejercicios efectivos para tonificar y fortalecer. Prepárense para moverse, sudar y superar sus límites. ¡Comencemos con toda la energía!',
-            imagen: 'src/assets/Gap.jpg'
-        },
-        {
-            nombre: 'Levantamiento de pesas',
-            descripcion: '¡Bienvenidos a nuestra sesión de levantamiento de pesas! Hoy nos enfocaremos en la técnica, la fuerza y el control para alcanzar tus metas. Recuerda escuchar a tu cuerpo, mantener la postura correcta y dar lo mejor.',
-            imagen: 'src/assets/Pesas.jpg'
-        },
-        {
-            nombre: 'Cardio',
-            descripcion: '¡Bienvenidos a nuestra clase de cardio! Prepárense para una sesión llena de energía, movimientos dinámicos y mucha diversión. Nuestro objetivo es aumentar el ritmo cardíaco, quemar calorías ',
-            imagen: 'src/assets/Cardio.jpg'
-        },
-        {
-            nombre: 'Otros ejercicios',
-            descripcion: '¡Bienvenidos a nuestra clase de cardio! Prepárense para una sesión llena de energía, movimientos dinámicos y mucha diversión. Nuestro objetivo es aumentar el ritmo cardíaco, quemar calorías',
-            imagen: 'src/assets/Otro.jpg'
-        },
-    ];
+    const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
+
+    // Obtener datos del usuario desde localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user?.token;
+    const userId = user?.userId.id;
+
+    useEffect(() => {
+        if (!token) {
+            console.error("No token found in localStorage");
+            return;
+        }
+
+        const fetchClases = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/clase/`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setClases(response.data.data);
+            } catch (error) {
+                console.error("Error fetching clases:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchClases();
+    }, [BASE_URL, token]);
+
+    const handleSuscribirse = (clase) => {
+        setSelectedClase(clase);
+        setShowDialog(true);
+    };
+
+    const handleConfirm = async () => {
+        if (!selectedClase || !selectedClase.id) {
+            alert("Por favor selecciona una clase válida.");
+            return;
+        }
+        if (!email || !email.includes("@")) {
+            alert("Por favor ingresa un correo válido.");
+            return;
+        }
+        if (!fecha) {
+            alert("Por favor selecciona una fecha.");
+            return;
+        }
+
+        const payload = { email, userId };
+
+        try {
+            await axios.patch(
+                `${BASE_URL}/clase/newPart/${selectedClase.id}`,
+                payload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            alert("¡Inscripción exitosa!");
+        } catch (error) {
+            if (error.response) {
+                alert(`Error: ${error.response.data.message || "No se pudo completar la inscripción"}`);
+            } else {
+                alert("Error desconocido. Inténtalo más tarde.");
+            }
+        } finally {
+            setShowDialog(false);
+            setFecha(new Date());
+            setEmail("");
+        }
+    };
+
+    const handleCancel = () => {
+        setShowDialog(false);
+        setFecha(new Date());
+        setEmail("");
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="w-full mt-5">
-            <Card className='border-transparent shadow-none '>
-                <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Sabes los beneficios de los ejercicios?</h1>
-                <p className="text-1xl font-semibold text-left mb-4 text-primary">Has click en Inscríbete para entrar a una clase</p>
+            <Card className="border-transparent shadow-none">
+                <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases Disponibles</h1>
                 <div className="grid">
                     {clases.map((clase, index) => (
                         <div key={index} className="col-12 md:col-4 mt-2">
-                                <img src={clase.imagen} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
-                                <Card title={clase.nombre} subTitle="Instructor: Juan Perez" footer={footer} >
-                                <p className="p-m-0">{clase.descripcion}</p>
+                            <Card
+                                title={clase.nombre}
+                                subTitle="Instructor: Juan Perez"
+                                footer={
+                                    <Button
+                                        label="Inscribirse"
+                                        icon="pi pi-arrow-right"
+                                        onClick={() => handleSuscribirse(clase)}
+                                    />
+                                }
+                            >
+                                <img
+                                    src={clase.foto || "src/assets/default.jpg"}
+                                    alt={clase.nombre}
+                                    className="w-full max-h-10rem md:max-w-full object-cover border-round"
+                                />
+                                <p>{clase.descripcion}</p>
                             </Card>
                         </div>
                     ))}
                 </div>
-
             </Card>
 
+            <Dialog
+                visible={showDialog}
+                header={`Inscribirse a ${selectedClase?.nombre}`}
+                onHide={handleCancel}
+                style={{ width: "30vw" }}
+            >
+                <div className="field">
+                    <label htmlFor="email">Correo electrónico</label>
+                    <InputText
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Ingresa el correo del usuario"
+                        className="w-full"
+                    />
+                </div>
+                <div className="field mt-3">
+                    <label htmlFor="fecha">Fecha</label>
+                    <Calendar
+                        id="fecha"
+                        value={fecha}
+                        onChange={(e) => setFecha(e.value)}
+                        dateFormat="dd/mm/yy"
+                        className="w-full"
+                    />
+                </div>
+                <div className="mt-4 flex justify-content-end gap-2">
+                    <Button label="Cancelar" className="p-button-text" onClick={handleCancel} />
+                    <Button label="Confirmar" className="p-button-primary" onClick={handleConfirm} />
+                </div>
+            </Dialog>
         </div>
     );
-
-
-}
-
+};
 export default EmpleadoClases
