@@ -41,6 +41,17 @@ const LandingLayout = () => {
             },
         },
         {
+            "label": "Spa",
+            "icon": "pi pi-sun", 
+            "command": () => {
+                scroller.scrollTo("Spa", {
+                    smooth: true,
+                    duration: 500,
+                    offset: -70,
+                });
+            },
+        },        
+        {
             label: 'Tus Clases',
             icon: 'pi pi-calendar', // Icono de calendario para clases programadas
             command: () => {

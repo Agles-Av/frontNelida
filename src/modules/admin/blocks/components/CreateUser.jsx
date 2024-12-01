@@ -70,7 +70,6 @@ const CreateUser = ({ abrir, onHide, getUser, messages }) => {
         if (file) {
             try {
                 const coso = await convertirImagenBase64(file);
-                console.log(coso);
                 setFieldValue({ ...initialValues, foto: coso });
             } catch (error) {
                 console.error("Error al convertir la imagen:", error);
@@ -82,7 +81,6 @@ const CreateUser = ({ abrir, onHide, getUser, messages }) => {
 
     const handleSubmit = async (values) => {
         try {
-            console.log("Formulario enviado:", values);
             values.role = selectedRole;
 
             const response = await AxiosCLient({
@@ -92,7 +90,6 @@ const CreateUser = ({ abrir, onHide, getUser, messages }) => {
             });
 
             if (!response.error) {
-                console.log("Usuario creado con éxito:", response.data);
                 getUser();
                 messages.current.show({
                     sticky: true,

@@ -5,6 +5,8 @@ import { Button } from 'primereact/button';
 import { ConfirmPopup } from 'primereact/confirmpopup'; // To use <ConfirmPopup> tag
 import { confirmPopup } from 'primereact/confirmpopup';
 import { Messages } from 'primereact/messages';
+import CreateClass from './components/CreateClass';
+import EditClass from './components/EditClass';
 
 
 const EmpleadoClases = () => {
@@ -36,7 +38,7 @@ const EmpleadoClases = () => {
         };
 
         return (
-            <>
+            <div className='flex justify-content-between'>
                 <Button
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-text"
@@ -44,19 +46,18 @@ const EmpleadoClases = () => {
                 />
                 {rowData.status ? (
                     <Button
-                        icon="pi pi-ban" // Icono de desactivar
+                        icon="pi pi-ban"
                         className="p-button-rounded p-button-danger"
-                        onClick={handleStatusChange} // Mostrar el popup de confirmación
+                        onClick={handleStatusChange}
                     />
                 ) : (
-                    /* Si el usuario está inactivo (status === false) */
                     <Button
                         icon="pi pi-check" // Icono de activar
                         className="p-button-rounded p-button-success"
-                        onClick={handleStatusChange} // Mostrar el popup de confirmación
+                        onClick={handleStatusChange} 
                     />
                 )}
-            </>
+            </div>
         );
     };
 
@@ -84,40 +85,6 @@ const EmpleadoClases = () => {
     useEffect(() => {
         getDatos();
     }, []);
-
-    const clases = [
-        {
-            nombre: 'Zumba',
-            descripcion: '"¡Bienvenidos a nuestra clase de Zumba! Prepárense para disfrutar una hora llena de energía, música y movimientos divertidos. No importa tu nivel, lo importante es moverte, sonreír y disfrutar.',
-            imagen: 'src/assets/Zumba.jpg'
-        },
-        {
-            nombre: 'Yoga',
-            descripcion: 'Bienvenidos a nuestra clase de yoga! Este es un espacio para conectar contigo mismo, relajar la mente y fortalecer el cuerpo. Respira profundamente, suelta las tensiones y prepárate para encontrar equilibrio y tranquilidad.',
-            imagen: 'src/assets/Yoga.jpg'
-        },
-        {
-            nombre: 'GAP',
-            descripcion: '¡Bienvenidos a nuestra clase de GAP! Hoy trabajaremos glúteos, abdominales y piernas con ejercicios efectivos para tonificar y fortalecer. Prepárense para moverse, sudar y superar sus límites. ¡Comencemos con toda la energía!',
-            imagen: 'src/assets/Gap.jpg'
-        },
-        {
-            nombre: 'Levantamiento de pesas',
-            descripcion: '¡Bienvenidos a nuestra sesión de levantamiento de pesas! Hoy nos enfocaremos en la técnica, la fuerza y el control para alcanzar tus metas. Recuerda escuchar a tu cuerpo, mantener la postura correcta y dar lo mejor de ti.',
-            imagen: 'src/assets/Pesas.jpg'
-        },
-        {
-            nombre: 'Cardio',
-            descripcion: '¡Bienvenidos a nuestra clase de cardio! Prepárense para una sesión llena de energía, movimientos dinámicos y mucha diversión. Nuestro objetivo es aumentar el ritmo cardíaco, quemar calorías ',
-            imagen: 'src/assets/Cardio.jpg'
-        },
-        {
-            nombre: 'Otros ejercicios',
-            descripcion: 'Proximamente.....',
-            imagen: 'src/assets/Otro.jpg'
-        },
-    ];
-
 
     const changeStatus = async (rowData) => {
         console.log(rowData);
@@ -153,15 +120,25 @@ const EmpleadoClases = () => {
 
     return (
         <div className="w-full mt-5">
-            <Messages ref={messages} />
+            <CreateClass abrir={showDialog} onHide={() => setShowDialog(false)} getData={getDatos} messages={messages} />
+            <EditClass abrir={showEditDialog} onHide={() => setShowEditDialog(false)} getData={getDatos} messages={messages} data={selectedClass} />
             <Card className='border-transparent shadow-none '>
                 <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Sabes los beneficios de los ejercicios?</h1>
-                <p className="text-1xl font-semibold text-left mb-4 text-primary">Has click en Inscríbete para entrar a una clase</p>
+                <Messages ref={messages} />
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                        label="Añadir Clase"
+                        icon="pi pi-plus"
+                        className="mb-3"
+                        onClick={() => setShowDialog(true)}
+                    />
+                </div>
                 <div className="grid">
                     {data.map((clase, index) => (
                         <div key={index} className="col-12 md:col-4 mt-2">
-                            <img src={clase.imagen} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
-                            <Card title={clase.nombre} subTitle="Instructor: Juan Perez" footer={actionsBodyTemplate(clase)} >
+                            <img src={clase.foto} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
+                            <Card title={clase.nombre} footer={actionsBodyTemplate(clase)} style={{minHeight:'15rem'}}>
                                 <p className="p-m-0">{clase.descripcion}</p>
                             </Card>
                         </div>

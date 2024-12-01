@@ -35,7 +35,7 @@ const OfertasMembresias = () => {
                                     subTitle={`Hasta ${promo.porcentaje}% de descuento`}
                                 >
                                     <img
-                                        src={promo.imagen && promo.imagen.length > 5 ? promo.imagen : 'src/assets/pm1.jpg'}
+                                        src={promo.imagen}
                                         alt={promo.nombre}
                                         className="w-full max-h-12rem object-cover border-round"
                                     />

@@ -9,11 +9,13 @@ import { InputText } from 'primereact/inputtext';
 import { FloatLabel } from 'primereact/floatlabel';
 import Membresias from './Membresias';
 import { FileUpload } from 'primereact/fileupload'
+import AxiosCLient from '../../config/http-gateway/http-client';
+import { Messages } from 'primereact/messages';
 
 const ModaLogin = ({ abrir, onHide }) => {
+    const [altCerrarModal, setAltCerrarModal] = useState(false);
 
-
-
+    const messages = useRef(null); // Referencia al componente Messages
     const stepperRef = useRef(null);
 
     const [membershipSelected, setMembershipSelected] = useState(null);
@@ -22,7 +24,6 @@ const ModaLogin = ({ abrir, onHide }) => {
     const handleMembershipSelect = (membership) => {
         setMembershipSelected(membership); // Guardar la membresía seleccionada
         setDatos(membership); // Actualizar 'datos' con la membresía seleccionada
-        console.log('Membresía seleccionada:', membership);
         stepperRef.current.nextCallback(); // Avanza al siguiente StepperPanel
     };
 
@@ -40,13 +41,49 @@ const ModaLogin = ({ abrir, onHide }) => {
         cvv: '',
     };
 
-    const handleSubmit = (values) => {
-        console.log('Datos finales enviados:', {
-            ...values,
-            membership: membershipSelected,
-        });
-        console.log(values.foto);
-        
+    const handleSubmit = async (values,{resetForm}) => {
+        const data = {
+            nombre: values.nombre,
+            apPaterno: values.apPaterno,
+            apMaterno: values.apMaterno,
+            email: values.email,
+            edad: values.edad,
+            telefono: values.telefono,
+            contrasena: values.contrasena,
+            foto: values.foto,
+            role: { id: 2 },
+        };
+
+        try {
+            const response = await AxiosCLient({
+                method: 'POST',
+                url: `/usuario/nuevo/${datos.id}/${true}`,
+                data: data,
+            });
+            if (response.status === 'CREATED') {
+                if (messages.current) {
+                    messages.current.show({
+                        severity: 'success',
+                        summary: 'Registro exitoso',
+                        detail: response.message || 'El usuario se registró correctamente.',
+                        life: 5000,
+                    });
+                }
+                onHide();
+            resetForm();   
+            }
+        } catch (error) {
+            console.log('Error:', error);
+            
+            if (messages.current) {
+                messages.current.show({
+                    severity: 'error',
+                    summary: 'Error en el registro',
+                    detail:   error.response?.data?.message || 'El correo ya pertenece a una cuenta.' ,
+                    life: 5000,
+                });
+            }
+        }
     };
 
 
@@ -92,6 +129,7 @@ const ModaLogin = ({ abrir, onHide }) => {
 
     return (
         <div className="card flex justify-content-center">
+            <Messages ref={messages} />
             <Dialog
                 header="Regístrate"
                 visible={abrir}
@@ -104,8 +142,8 @@ const ModaLogin = ({ abrir, onHide }) => {
                     initialValues={initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
-                >
-                    {({ handleSubmit, values, isValid, dirty }) => (
+                >   
+                    {({ handleSubmit, values, isValid, dirty, resetForm }) => (
                         <Form onSubmit={handleSubmit}>
                             <div className="card flex justify-content-center">
                                 <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }}>
@@ -251,7 +289,7 @@ const ModaLogin = ({ abrir, onHide }) => {
                                                     accept="image/*" // Permitir solo imágenes
                                                     maxFileSize={1000000} // Tamaño máximo permitido (1 MB en este caso)
                                                     multiple={false} // Permitir solo un archivo
-                                                    
+
                                                     customUpload
                                                     uploadHandler={(event) => {
                                                         const file = event.files[0]; // Obtenemos el archivo cargado

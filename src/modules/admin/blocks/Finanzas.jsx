@@ -3,6 +3,7 @@ import AxiosClient from '../../../config/http-gateway/http-client';
 import { Chart } from 'primereact/chart';
 import { Dropdown } from 'primereact/dropdown';
 import { Card } from 'primereact/card';
+import { Button } from 'react-scroll';
 
 const Finanzas = () => {
   const [datos, setDatos] = useState([]); // Datos originales de la API
@@ -33,6 +34,42 @@ const Finanzas = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const ExportButton = () => {
+    const handleExport = async () => {
+      try {
+        const response = await AxiosClient({
+          url: '/suscripcion/exportar/',
+          method: 'GET',
+          responseType: 'blob',
+        });
+
+        if (response && response.size > 0) {
+          // Crear un blob a partir de los datos
+          const blob = new Blob([response], { type: 'text/csv' });
+
+          // Crear un enlace temporal para la descarga
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'suscripciones.csv'); // Nombre del archivo
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          console.error('El archivo recibido está vacío o no se pudo procesar.');
+        }
+      } catch (error) {
+        console.error('Error al exportar:', error);
+      }
+    };
+
+    return (
+      <button onClick={handleExport} className="p-button p-component">
+        Exportar Suscripciones
+      </button>
+    );
   };
 
   const procesarDatos = (data, tipoVista) => {
@@ -104,7 +141,12 @@ const Finanzas = () => {
   return (
 
     <Card className='border-transparent shadow-none '>
-      <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Finanzas</h1>
+      <div className='mb-4'>
+        <h1 className="text-5xl font-semibold text-left mb-4 text-primary">Finanzas</h1>
+        <ExportButton />
+      </div>
+
+
       {loading ? (
         <p>Cargando datos...</p>
       ) : (
