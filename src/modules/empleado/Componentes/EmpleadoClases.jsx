@@ -48,9 +48,9 @@ const EmpleadoClases = ()=>{
     }, [BASE_URL, token]);
 
     const handleSuscribirse = (clase) => {
-        setSelectedClase(clase); // Clase seleccionada para suscribirse
-        setEmail(""); // Limpia el campo del correo para que el usuario pueda escribir uno
-        setShowDialog(true); // Abre el diálogo para confirmar
+        setSelectedClase(clase); 
+        setEmail(""); 
+        setShowDialog(true); 
     };
     
     const handleConfirm = async () => {
@@ -75,7 +75,7 @@ const EmpleadoClases = ()=>{
         }
     
         try {
-            // Buscar el usuario por correo
+    
             const userResponse = await axios.get(`${BASE_URL}/usuario/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -148,8 +148,8 @@ const EmpleadoClases = ()=>{
                 });
             }
         } finally {
-            setShowDialog(false); // Cierra el diálogo
-            setEmail(""); // Limpia el correo
+            setShowDialog(false); 
+            setEmail(""); 
         }
     };
 
@@ -172,7 +172,6 @@ const EmpleadoClases = ()=>{
                         <div key={index} className="col-12 md:col-4 mt-2">
                             <Card
                                 title={clase.nombre}
-                                subTitle={`Instructor: ${clase.instructor || "Desconocido"}`}
                                 footer={
                                     <Button
                                         label="Inscribirse"

@@ -13,50 +13,30 @@ const EmpleadoLandingPage = () => {
     const { toggleTheme } = useTheme();
 
     const items = [
-    
         {
             label: 'Instalaciones',
             icon: 'pi pi-home',
-            command: () => {
-                scroller.scrollTo('Carrusel', {
-                    smooth: true,
-                    duration: 500,
-                    offset: -70,
-                });
-            },
+            command: () => scroller.scrollTo('Carrusel', { smooth: true, duration: 500, offset: -70 }),
         },
         {
-            label: 'Planes',
-            icon: 'pi pi-star',
-            command: () => {
-                scroller.scrollTo('membresias', {
-                    smooth: true,
-                    duration: 500,
-                    offset: -70,
-                });
-            },
+            label: 'Usuarios',
+            icon: 'pi pi-user',
+            command: () => scroller.scrollTo('Usuarios', { smooth: true, duration: 500, offset: -70 }),
         },
         {
-            label: 'Conócenos',
-            icon: 'pi pi-info-circle',
-            command: () => {
-                scroller.scrollTo('Clases', {
-                    smooth: true,
-                    duration: 500,
-                    offset: -70,
-                });
-            },
+            label: 'Promociones',
+            icon: 'pi pi-tag',
+            command: () => scroller.scrollTo('Promociones', { smooth: true, duration: 500, offset: -70 }),
+        },
+        {
+            label: 'Clases',
+            icon: 'pi pi-calendar',
+            command: () => scroller.scrollTo('Clases', { smooth: true, duration: 500, offset: -70 }),
         },
         {
             label: 'Contáctanos',
-            icon: 'pi pi-user',
-            command: () => {
-                scroller.scrollTo('footer', {
-                    smooth: true,
-                    duration: 500,
-                    offset: -70,
-                });
-            },
+            icon: 'pi pi-phone',
+            command: () => scroller.scrollTo('Footer', { smooth: true, duration: 500, offset: -70 }),
         },
     ];
 

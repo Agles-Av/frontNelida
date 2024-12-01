@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Dialog } from 'primereact/dialog';
@@ -8,8 +8,10 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { useNavigate } from 'react-router-dom';
 import AxiosCLient from '../../../config/http-gateway/http-client';
 import AuthContext from '../../../config/context/auth-context';
+import { Messages } from 'primereact/messages';
 
 const ModalLog = ({ abrir, onHide }) => {
+    const messages = useRef(null); // Referencia al componente Messages
     const navigate = useNavigate();
     const {user, dispatch} =  useContext(AuthContext);
     // Esquema de validación usando Yup
@@ -55,7 +57,14 @@ const ModalLog = ({ abrir, onHide }) => {
             // Redirigir a la ruta correspondiente
             navigate(`/${response.data.role.nombre.toLowerCase()}`);
         } catch (error) {
-            console.log('Error:', error);
+            if (messages.current) {
+                messages.current.show({
+                    severity: 'error',
+                    summary: 'Error en el registro',
+                    detail:    'Revisa que tus datos sean correctos'|| error.response?.data?.message,
+                    life: 5000,
+                });
+            }
         }
     };
     
@@ -70,6 +79,7 @@ const ModalLog = ({ abrir, onHide }) => {
                 onHide={onHide}
                 position="top"
             >
+                <Messages ref={messages} />
                 {/* Formulario con Formik */}
                 <Formik
                     initialValues={{ email: '', password: '' }}
@@ -77,19 +87,19 @@ const ModalLog = ({ abrir, onHide }) => {
                     onSubmit={onSubmit}
                 >
                     {({ handleSubmit, isValid, dirty }) => (
-                        <Form onSubmit={handleSubmit}>
+                        <Form onSubmit={handleSubmit} className="p-fluid">
                             <div className="grid mt-5">
                                 {/* Campo Email */}
-                                <div className="col">
+                                <div className="col-12 md:col-6 lg:col-5">
                                     <FloatLabel>
                                         <Field
                                             name="email"
                                             as={InputText}
                                             id="email"
+                                            maxLength="64"
                                             className={({ field }) =>
                                                 field && field.touched && field.error ? 'p-invalid' : ''
                                             }
-                                            maxLength="64"
                                         />
                                         <label htmlFor="email">Email</label>
                                     </FloatLabel>
@@ -99,22 +109,22 @@ const ModalLog = ({ abrir, onHide }) => {
                                         className="p-error"
                                     />
                                 </div>
-                                <div className="col-2">
-                                    <i className="pi pi-user"></i>
+                                <div className="col-12 md:col-1 lg:col-1 flex align-items-center justify-content-center">
+                                    <i className="pi pi-user text-2xl"></i>
                                 </div>
 
                                 {/* Campo Contraseña */}
-                                <div className="col">
+                                <div className="col-12 md:col-6 lg:col-5">
                                     <FloatLabel>
                                         <Field
                                             name="password"
                                             as={InputText}
                                             type="password"
                                             id="password"
+                                            maxLength="32"
                                             className={({ field }) =>
                                                 field && field.touched && field.error ? 'p-invalid' : ''
                                             }
-                                            maxLength="32"
                                         />
                                         <label htmlFor="password">Contraseña</label>
                                     </FloatLabel>
@@ -124,8 +134,8 @@ const ModalLog = ({ abrir, onHide }) => {
                                         className="p-error"
                                     />
                                 </div>
-                                <div className="col-2">
-                                    <i className="pi pi-lock"></i>
+                                <div className="col-12 md:col-1 lg:col-1 flex align-items-center justify-content-center">
+                                    <i className="pi pi-lock text-2xl"></i>
                                 </div>
                             </div>
 

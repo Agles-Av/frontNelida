@@ -10,23 +10,31 @@ import PromocionesEmpleado from './Componentes/PromocionesEmpleado';
 
 const EmpleadoLayout = () => {
 
-    return(
-        <>
-        <EmpleadoLandingPage/>
-        <CarruselEmpleado/>
-        <TablaUsuarios/>
-        <SPA/>
-        <EmpleadoClases/>
-        <PromocionesEmpleado/>
-        <EmpleadoFooter/>
+  return (
+    <>
 
+      <EmpleadoLandingPage />
 
+      <div id='Carrusel'>
+        <CarruselEmpleado />
+      </div>
+      <div id='Usuarios'>
+      <TablaUsuarios />
+      </div>
+      <SPA />
+      <div id='Clases'>
+      <EmpleadoClases />
+      </div>
+      <div id='Promociones'>
+      <PromocionesEmpleado />
+      </div>
+      <div id='Footer'>
+      <EmpleadoFooter />
+      </div>
+    </>
+  )
 
+};
 
-        </>
-    )
-
-  };
-  
   
 export default EmpleadoLayout

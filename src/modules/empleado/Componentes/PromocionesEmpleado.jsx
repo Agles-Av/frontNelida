@@ -6,7 +6,7 @@ const PromocionesEmpleado = () =>{
     const promociones = [
         {
             nombre: '',
-            descripcion: '20% descuento en tienda al ser miembro six pack en local',
+            descripcion: '20% descuento en tienda al ser miembro despues de un año en local',
             imagen: 'src/assets/pm1.jpg'
         },
         {
@@ -16,7 +16,7 @@ const PromocionesEmpleado = () =>{
         },
         {
             nombre: '',
-            descripcion: '20% descuento en tienda al ser miembro six pack en local',
+            descripcion: '20% descuento en tienda al ser tu cumpleaños mostrar INE en el local',
             imagen: 'src/assets/pm3.jpg'
         },
         {
