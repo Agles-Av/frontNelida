@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import AxiosCLient from '../../config/http-gateway/http-client';
 
 const Membresias = ({ register, onSelectMemberShip }) => {
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(3);
     const [membresias, setMembresia] = useState([]); // Inicializar como un array vacío
 
     const items = [
@@ -21,6 +21,7 @@ const Membresias = ({ register, onSelectMemberShip }) => {
             });
             if (response.data && Array.isArray(response.data)) { // Verificar si es un array
                 setMembresia(response.data); // Actualizar el estado solo si es un array
+                
             } else {
                 console.error('La respuesta no contiene un array válido');
             }

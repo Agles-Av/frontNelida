@@ -4,10 +4,10 @@ import { Button } from 'primereact/button';
 import AxiosCLient from '../../config/http-gateway/http-client';
 
 const Clases = () => {
-    const [clases, setClases] = useState([]); // Usar un estado llamado 'clases' para evitar confusión
+    const [clases, setClases] = useState([]);
 
     const footer = (clase) => (
-        <Button label="Suscribete" icon="pi pi-arrow-right" onClick={() => handleSuscribirse(clase.id)} />
+        <Button label="Suscríbete" icon="pi pi-arrow-right" onClick={() => handleSuscribirse(clase.id)} />
     );
 
     const handleClases = async () => {
@@ -17,8 +17,7 @@ const Clases = () => {
                 url: '/clase/',
             });
             if (response.data && Array.isArray(response.data)) {
-                setClases(response.data); // Guardar los datos en el estado
-                console.log('Clases:', response.data);
+                setClases(response.data);
             } else {
                 console.error('La respuesta no contiene un array válido');
             }
@@ -29,16 +28,15 @@ const Clases = () => {
 
     const handleSuscribirse = (id) => {
         console.log(`Suscribiéndose a la clase con ID: ${id}`);
-        // Aquí puedes implementar la lógica para suscribirse a una clase
     };
 
     useEffect(() => {
-        handleClases(); // Cargar las clases desde el backend al montar el componente
+        handleClases();
     }, []);
 
     return (
         <div className="w-full mt-5">
-            <Card className="border-transparent shadow-none">
+            <Card className="border-transparent shadow-none max:h-16rem ">
                 <h1 className="text-6xl font-semibold text-left mb-4 text-primary">Clases</h1>
                 <div className="grid">
                     {clases.map((clase) => (
@@ -47,13 +45,14 @@ const Clases = () => {
                                 title={clase.nombre}
                                 subTitle={`Instructor: ${clase.participantes.length > 0 ? clase.participantes[0].nombre : 'N/A'}`}
                                 footer={footer(clase)}
+                                className="h-full flex flex-column"
                             >
                                 <img
-                                    src={clase.foto.length > 5 || 'src/assets/Cardio.jpg'} // Imagen predeterminada si no hay foto
+                                    src={clase.foto.length > 5 ? clase.foto : 'src/assets/Cardio.jpg'}
                                     alt={clase.nombre}
                                     className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
                                 />
-                                <p className="p-m-0">{clase.descripcion}</p>
+                                <p className="p-m-0 text-justify flex-grow-1">{clase.descripcion}</p>
                             </Card>
                         </div>
                     ))}
