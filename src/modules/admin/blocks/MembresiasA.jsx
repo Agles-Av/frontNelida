@@ -164,7 +164,8 @@ const Membresias = () => {
                                     header={<h1 className="text-center">{membresia.nombre}</h1>}
                                     title={formatCurrency(membresia.precioOriginal)}
                                     footer={actionsBodyTemplate(membresia)}
-                                    className={`col ${index === 1 ? 'bg-blue-900 md:w-25rem shadow-5 text-color-secondary ' : 'md:w-25rem shadow-5'}`}
+                                    style={{minHeight: '23rem'}}
+                                    className={`col ${index === 1 ? 'bg-blue-900 md:w-25rem shadow-5 text-color-secondary' : 'md:w-25rem shadow-5'}`}
                                 >
                                     <div className='text-justify'>
                                         <ul className="list-disc">
