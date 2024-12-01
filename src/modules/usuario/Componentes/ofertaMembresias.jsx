@@ -31,6 +31,7 @@ const OfertasMembresias = () => {
                         {promociones.map((promo, index) => (
                             <div key={index} className="col-12 md:col-4 mt-2">
                                 <Card
+                                style={{minHeight:'20rem', maxHeight:'28rem'}}
                                     title={promo.nombre}
                                     subTitle={`Hasta ${promo.porcentaje}% de descuento`}
                                 >
