@@ -13,6 +13,7 @@ import { confirmPopup } from 'primereact/confirmpopup';
 import { Messages } from 'primereact/messages';
 import CrearUsuarioEmp from './CrearUsuarioEmp';
 import EditUsuarioEmp from './EditUsuarioEmp';
+import { Dropdown } from 'primereact/dropdown';
 
 const TablaUsuarios = () => {
   const [data, setData] = useState([]);
@@ -23,7 +24,14 @@ const TablaUsuarios = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [userType, setUserType] = useState('');
   const messages = useRef(null);
+
+  const userTypeOptions = [
+    { label: 'Todos', value: '' },
+    { label: 'Clientes', value: 'CLIENTE' },
+    { label: 'Empleados', value: 'EMPLEADO' },
+  ];
 
   const getRoles = async () => {
     try {
@@ -54,6 +62,17 @@ const TablaUsuarios = () => {
     getRoles();
   }, []);
 
+  // Lógica para filtrar por tipo y búsqueda
+  useEffect(() => {
+    const filteredByType = data.filter((usuario) =>
+      userType ? usuario.role.nombre === userType : true
+    );
+    const filteredBySearch = filteredByType.filter((usuario) =>
+      usuario.email.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredData(filteredBySearch);
+  }, [data, searchValue, userType]);
+
   const searchEmails = (event) => {
     const query = event.query.toLowerCase();
     const suggestions = data
@@ -64,16 +83,6 @@ const TablaUsuarios = () => {
 
   const onSearchChange = (value) => {
     setSearchValue(value);
-
-    if (value.trim() === '') {
-      setFilteredData(data); // Mostrar todos los usuarios si no hay búsqueda
-    } else {
-      setFilteredData(
-        data.filter((usuario) =>
-          usuario.email.toLowerCase().includes(value.toLowerCase())
-        )
-      );
-    }
   };
 
   const avatarBodyTemplate = (rowData) => (
@@ -121,13 +130,20 @@ const TablaUsuarios = () => {
 
       <Messages ref={messages} />
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+        <Dropdown
+          value={userType}
+          options={userTypeOptions}
+          onChange={(e) => setUserType(e.value)}
+          placeholder="Filtrar por tipo"
+          style={{ width: '200px' }}
+        />
         <AutoComplete
           value={searchValue}
           suggestions={emailSuggestions}
           completeMethod={searchEmails}
           onChange={(e) => onSearchChange(e.value)}
-          placeholder="Buscardor por correo "
+          placeholder="Buscardor por correo"
           field="email"
           style={{ width: '100%' }}
         />
