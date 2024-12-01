@@ -18,11 +18,24 @@ import { Formik } from 'formik';
 import CreateUser from './components/CreateUser';
 import EditUser from './components/EditUser';
 import { set } from 'react-hook-form';
+import { AutoComplete } from 'primereact/autocomplete';
+import { Tooltip } from 'primereact/tooltip';
+
 
 const TablaUsuarios = () => {
   const [data, setData] = useState([]); // Datos originales de la API
+  const [filteredData, setFilteredData] = useState([]); 
+  const [emailSuggestions, setEmailSuggestions] = useState([]); 
   const [showDialog, setShowDialog] = useState(false); // Controla la ventana emergente
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState([]); 
+  const [searchValue, setSearchValue] = useState(''); 
+  const [userType, setUserType] = useState('');
+
+  const userTypeOptions = [
+    { label: 'Todos', value: '' },
+    { label: 'Clientes', value: 'CLIENTE' },
+    { label: 'Empleados', value: 'EMPLEADO' },
+  ];
   const messages = useRef(null); // Usar useRef para la referencia de Messages
   const [selectedUser, setSelectedUser] = useState([{
     id: 0,
@@ -37,6 +50,30 @@ const TablaUsuarios = () => {
     foto: null,
   }]);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  
+
+  // Lógica para filtrar por tipo y búsqueda
+  useEffect(() => {
+    const filteredByType = data.filter((usuario) =>
+      userType ? usuario.role.nombre === userType : true
+    );
+    const filteredBySearch = filteredByType.filter((usuario) =>
+      usuario.email.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredData(filteredBySearch);
+  }, [data, searchValue, userType]);
+
+  const searchEmails = (event) => {
+    const query = event.query.toLowerCase();
+    const suggestions = data
+      .map((usuario) => usuario.email)
+      .filter((email) => email.toLowerCase().includes(query));
+    setEmailSuggestions(suggestions);
+  };
+
+  const onSearchChange = (value) => {
+    setSearchValue(value);
+  };
 
   const getRoles = async () => {
     try {
@@ -64,7 +101,8 @@ const TablaUsuarios = () => {
         const usuariosFiltrados = response.data.filter(
           (usuario) => usuario.role && usuario.role.nombre !== 'ADMIN'
         );
-        setData(usuariosFiltrados); // Guarda solo los usuarios no admin
+        setData(usuariosFiltrados);
+        setFilteredData(usuariosFiltrados); // Guarda solo los usuarios no admin
       }
     } catch (error) {
       console.error('Error al obtener datos:', error);
@@ -129,19 +167,26 @@ const TablaUsuarios = () => {
         reject: () => { }
       });
     };
-
+  
     return (
       <>
+        {/* Botón de editar */}
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-text"
           onClick={() => goEdit(rowData)}
+          id={`edit-btn-${rowData.id}`} // Identificador único
+          tooltip="Editar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
         />
+  
+        {/* Botón de activar/desactivar */}
         {rowData.status ? (
           <Button
             icon="pi pi-ban" // Icono de desactivar
             className="p-button-rounded p-button-danger"
             onClick={handleStatusChange} // Mostrar el popup de confirmación
+            id={`status-btn-${rowData.id}`} // Identificador único
+            tooltip="Desactivar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
           />
         ) : (
           /* Si el usuario está inactivo (status === false) */
@@ -149,11 +194,14 @@ const TablaUsuarios = () => {
             icon="pi pi-check" // Icono de activar
             className="p-button-rounded p-button-success"
             onClick={handleStatusChange} // Mostrar el popup de confirmación
+            id={`status-btn-${rowData.id}`} // Identificador único
+            tooltip="Reactivar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
           />
         )}
       </>
     );
   };
+  
 
   // Muestra solo la última suscripción del arreglo
   const suscripcionBodyTemplate = (rowData) => {
@@ -184,9 +232,27 @@ const TablaUsuarios = () => {
           onClick={() => setShowDialog(true)}
         />
       </div>
+      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+        <Dropdown
+          value={userType}
+          options={userTypeOptions}
+          onChange={(e) => setUserType(e.value)}
+          placeholder="Filtrar por tipo"
+          style={{ width: '200px' }}
+        />
+        <AutoComplete
+          value={searchValue}
+          suggestions={emailSuggestions}
+          completeMethod={searchEmails}
+          onChange={(e) => onSearchChange(e.value)}
+          placeholder="Buscardor por correo"
+          field="email"
+          style={{ width: '100%' }}
+        />
+      </div>
 
       <DataTable
-        value={data}
+        value={filteredData}
         paginator
         rows={10}
         rowsPerPageOptions={[5, 10, 20]}
@@ -209,7 +275,7 @@ const TablaUsuarios = () => {
           header="Suscripción Actual"
           body={suscripcionBodyTemplate}
         />
-        <Column body={actionsBodyTemplate} style={{ textAlign: 'center' }} />
+        <Column body={actionsBodyTemplate} style={{ textAlign: 'center' }} header='Accciones'/>
       </DataTable>
 
       <CreateUser

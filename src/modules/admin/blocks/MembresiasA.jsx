@@ -110,12 +110,14 @@ const Membresias = () => {
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-text"
                     onClick={() => goEdit(rowData)}
+                    tooltip="Editar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
                 />
                 {rowData.status ? (
                     <Button
                         icon="pi pi-ban" // Icono de desactivar
                         className="p-button-rounded p-button-danger"
                         onClick={handleStatusChange} // Mostrar el popup de confirmación
+                        tooltip="Desactivar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
                     />
                 ) : (
                     /* Si el usuario está inactivo (status === false) */
@@ -123,6 +125,7 @@ const Membresias = () => {
                         icon="pi pi-check" // Icono de activar
                         className="p-button-rounded p-button-success"
                         onClick={handleStatusChange} // Mostrar el popup de confirmación
+                        tooltip="Reactivar" tooltipOptions={{ showDelay: 1000, hideDelay: 50, position: 'top' }}
                     />
                 )}
             </div>
