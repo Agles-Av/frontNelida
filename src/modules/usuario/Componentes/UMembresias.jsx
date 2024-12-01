@@ -166,6 +166,7 @@ const Membresias = () => {
                         <div key={index} className="col">
                             <div className="card flex justify-content-center">
                                 <Card
+                                style={{minHeight:'18rem', maxHeight:'24rem'}}
                                     header={<h1 className="text-center">{membresia.nombre}</h1>}
                                     title={`$${membresia.precioOriginal}`}
                                     subTitle={membresia.descripcion}

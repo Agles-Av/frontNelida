@@ -72,7 +72,9 @@ const ClasesSuscritas = () => {
                     <div className="grid">
                         {clasesSuscritas.map((clase) => (
                             <div key={clase.id} className="col-12 md:col-4 mt-2">
-                                <Card title={clase.nombre} className="relative">
+                                <Card title={clase.nombre} className="relative"
+                                style={{minHeight:'18rem', maxHeight:'21rem'}}
+                                >
                                     <Button
                                         icon="pi pi-trash"
                                         className="p-button-danger absolute top-0 right-0 m-3 text-lg"

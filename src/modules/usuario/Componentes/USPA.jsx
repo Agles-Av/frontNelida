@@ -122,7 +122,7 @@ const SPA = () => {
                     {spaClases.length > 0 ? (
                         spaClases.map((clase, index) => (
                             <div key={index} className="col-12 md:col-4 mt-2">
-                                <Card
+                                <Card 
                                     title={clase.nombre}
                                     footer={
                                         <Button
@@ -133,7 +133,7 @@ const SPA = () => {
                                     }
                                 >
                                     <img
-                                        src={clase.foto.length > 5 || 'src/assets/Spa.jpg'}
+                                        src={clase.foto}
                                         alt={clase.nombre}
                                         className="w-full max-h-10rem md:max-w-full md:max-h-10rem object-cover border-round"
                                     />
