@@ -148,7 +148,7 @@ const PromocionesEmpleado = () =>{
                     {data.map((clase, index) => (
                         <div key={index} className="col-12 md:col-3 mt-2">
                                 <img src={clase.imagen} alt={clase.nombre}  className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
-                                <Card title={clase.nombre} footer={actionsBodyTemplate(clase)}>
+                                <Card title={clase.nombre} footer={actionsBodyTemplate(clase)} style={{minHeight:'14rem', maxHeight:'20rem'}}>
                                 <p className="p-m-0">{clase.descripcion}</p>
                             </Card>
                         </div>

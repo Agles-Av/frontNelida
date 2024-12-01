@@ -143,7 +143,7 @@ const EmpleadoClases = () => {
                     {data.map((clase, index) => (
                         <div key={index} className="col-12 md:col-4 mt-2">
                             <img src={clase.foto} alt={clase.nombre} className="w-full max-h-10rem  md:max-w-full md:max-h-10rem object-cover border-round" />
-                            <Card title={clase.nombre} footer={actionsBodyTemplate(clase)} style={{minHeight:'15rem'}}>
+                            <Card title={clase.nombre} footer={actionsBodyTemplate(clase)} style={{minHeight:'18rem', maxHeight:'20rem'}}>
                                 <p className="p-m-0">{clase.descripcion}</p>
                             </Card>
                         </div>
