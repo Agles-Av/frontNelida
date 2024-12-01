@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menubar } from 'primereact/menubar';
 import { Avatar } from 'primereact/avatar';
+import { scroller } from 'react-scroll';
 import { useTheme } from '../../../context/ThemeContext';
 import LoggOutButton from '../../../components/LoggOutButton';
 
@@ -77,17 +78,20 @@ const start = (
         />
     </div>
 );
-    const end = (
-        <div className="flex align-items-center gap-2">
-            <LoggOutButton/>
-        </div>
-    );
 
-    return (
-        <div className="card shadow-1">
-            <Menubar start={start} model={items} end={end} />
-        </div>
-    );
+
+const end = (
+    <div className="flex align-items-center gap-2">
+        <LoggOutButton />
+    </div>
+);
+
+
+return (
+    <div className="card shadow-1">
+        <Menubar start={start} model={items} end={end} />
+    </div>
+);
 };
 
 export default EmpleadoLandingPage

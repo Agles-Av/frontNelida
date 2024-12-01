@@ -1,28 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
+import { Calendar } from "primereact/calendar";
 
 
 
 const EmpleadoClases = ()=>{
+
     const [clases, setClases] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedClase, setSelectedClase] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [fecha, setFecha] = useState(new Date());
     const [email, setEmail] = useState("");
+    
 
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
 
     // Obtener datos del usuario desde localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
-    const userId = user?.userId.id;
 
+    // Obtener las clases
     useEffect(() => {
         if (!token) {
             console.error("No token found in localStorage");
@@ -46,48 +48,108 @@ const EmpleadoClases = ()=>{
     }, [BASE_URL, token]);
 
     const handleSuscribirse = (clase) => {
-        setSelectedClase(clase);
-        setShowDialog(true);
+        setSelectedClase(clase); // Clase seleccionada para suscribirse
+        setEmail(""); // Limpia el campo del correo para que el usuario pueda escribir uno
+        setShowDialog(true); // Abre el diálogo para confirmar
     };
-
+    
     const handleConfirm = async () => {
         if (!selectedClase || !selectedClase.id) {
-            alert("Por favor selecciona una clase válida.");
+            toast.current.show({
+                severity: "warn",
+                summary: "Advertencia",
+                detail: "Selecciona una clase válida.",
+                life: 3000,
+            });
             return;
         }
+    
         if (!email || !email.includes("@")) {
-            alert("Por favor ingresa un correo válido.");
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Ingresa un correo válido.",
+                life: 3000,
+            });
             return;
         }
-        if (!fecha) {
-            alert("Por favor selecciona una fecha.");
-            return;
-        }
-
-        const payload = { email, userId };
-
+    
         try {
-            await axios.patch(
-                `${BASE_URL}/clase/newPart/${selectedClase.id}`,
-                payload,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            alert("¡Inscripción exitosa!");
+            // Buscar el usuario por correo
+            const userResponse = await axios.get(`${BASE_URL}/usuario/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            const users = userResponse.data.data; // Asegúrate de que esta sea la estructura de los datos
+            const targetUser = users.find((u) => u.email === email);
+    
+            if (!targetUser) {
+                toast.current.show({
+                    severity: "warn",
+                    summary: "Advertencia",
+                    detail: "El correo ingresado no está registrado.",
+                    life: 3000,
+                });
+                return;
+            }
+    
+            // Construir el payload con el ID del usuario encontrado
+            const payload = {
+                userId: targetUser.id,
+            };
+    
+            // Hacer la solicitud para inscribir al usuario en la clase
+            await axios.patch(`${BASE_URL}/clase/newPart/${selectedClase.id}`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            toast.current.show({
+                severity: "success",
+                summary: "Éxito",
+                detail: `El usuario con correo ${email} fue inscrito correctamente.`,
+                life: 3000,
+            });
         } catch (error) {
             if (error.response) {
-                alert(`Error: ${error.response.data.message || "No se pudo completar la inscripción"}`);
+                const { status } = error.response;
+                if (status === 400) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Datos inválidos.",
+                        life: 3000,
+                    });
+                } else if (status === 401) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "No autorizado",
+                        detail: "Inicia sesión nuevamente.",
+                        life: 3000,
+                    });
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Error del servidor. Intenta más tarde.",
+                        life: 3000,
+                    });
+                }
             } else {
-                alert("Error desconocido. Inténtalo más tarde.");
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "No se pudo conectar al servidor.",
+                    life: 3000,
+                });
             }
         } finally {
-            setShowDialog(false);
-            setFecha(new Date());
-            setEmail("");
+            setShowDialog(false); // Cierra el diálogo
+            setEmail(""); // Limpia el correo
         }
     };
 
@@ -110,7 +172,7 @@ const EmpleadoClases = ()=>{
                         <div key={index} className="col-12 md:col-4 mt-2">
                             <Card
                                 title={clase.nombre}
-                                subTitle="Instructor: Juan Perez"
+                                subTitle={`Instructor: ${clase.instructor || "Desconocido"}`}
                                 footer={
                                     <Button
                                         label="Inscribirse"
@@ -165,4 +227,5 @@ const EmpleadoClases = ()=>{
         </div>
     );
 };
+
 export default EmpleadoClases

@@ -33,6 +33,7 @@ const LoggOutButton = () => {
     return (
         <div>
             {/* ConfirmDialog debería estar definido solo una vez en la jerarquía del componente */}
+            <ConfirmDialog/>
             <Button
                 label="Cerrar sesión"
                 className="p-button-secondary"
