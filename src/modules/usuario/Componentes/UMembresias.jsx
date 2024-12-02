@@ -255,7 +255,6 @@ const Membresias = () => {
                         )}
                     </div>
 
-                    {/* Campo de CVV */}
                     <div className="field mt-3">
                         <label htmlFor="cvv">CVV</label>
                         <br />
