@@ -7,6 +7,8 @@ import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
 const Membresias = () => {
     const [value, setValue] = useState('monthly'); // Default mensual
@@ -16,6 +18,8 @@ const Membresias = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
+        numtar: '',
+        cvv: '',
         fecha: new Date(),
         membresiaActual: '',
         membresiaNueva: '',
@@ -28,6 +32,20 @@ const Membresias = () => {
         { name: 'Anual', value: 'annual' },
         { name: 'Mensual', value: 'monthly' },
     ];
+    const validationSchema = yup.object({
+        numtar: yup
+            .string()
+            .matches(/^\d{16}$/, 'El número de tarjeta debe tener 16 dígitos')
+            .required('El número de tarjeta es requerido'),
+        fechaVencimiento: yup
+            .string()
+            .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'El formato debe ser MM/YY')
+            .required('La fecha de vencimiento es requerida'),
+        cvv: yup
+            .string()
+            .matches(/^\d{3}$/, 'El CVV debe tener 3 dígitos')
+            .required('El CVV es requerido'),
+    });
 
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user?.token;
@@ -84,6 +102,21 @@ const Membresias = () => {
         });
         setShowForm(true);
     };
+
+    const formik = useFormik({
+        initialValues: {
+            numtar: '',
+            fechaVencimiento: '',
+            cvv: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            // Mantener los datos existentes y añadir los nuevos campos validados
+            const updatedFormData = { ...formData, ...values };
+            handleConfirmar(updatedFormData); // Usar los valores validados
+        },
+    });
+
 
     const handleConfirmar = async () => {
         try {
@@ -166,7 +199,7 @@ const Membresias = () => {
                         <div key={index} className="col">
                             <div className="card flex justify-content-center">
                                 <Card
-                                style={{minHeight:'18rem', maxHeight:'24rem'}}
+                                    style={{ minHeight: '18rem', maxHeight: '24rem' }}
                                     header={<h1 className="text-center">{membresia.nombre}</h1>}
                                     title={`$${membresia.precioOriginal}`}
                                     subTitle={membresia.descripcion}
@@ -190,36 +223,86 @@ const Membresias = () => {
                 modal
                 onHide={() => setShowForm(false)}
             >
-                <div className="field mt-3">
-                    <label htmlFor="email">Correo Electrónico</label>
-                    <InputText id="email" value={formData.email} disabled />
-                </div>
-                <div className="field mt-3">
-                    <label htmlFor="fecha">Fecha</label>
-                    <Calendar
-                        id="fecha"
-                        value={formData.fecha}
-                        onChange={(e) => setFormData({ ...formData, fecha: e.value })}
-                        dateFormat="dd/mm/yy"
-                        className="w-full"
-                    />
-                </div>
-                <div className="field mt-3">
-                    <label htmlFor="membresiaActual">Membresía Actual</label>
-                    <InputText id="membresiaActual" value={formData.membresiaActual} disabled />
-                </div>
-                <div className="field mt-3">
-                    <label htmlFor="membresiaNueva">Nueva Membresía</label>
-                    <InputText id="membresiaNueva" value={formData.membresiaNuevaNombre} disabled />
-                </div>
-                <div className="field mt-3">
-                    <label htmlFor="precio">Precio Nueva Membresía</label>
-                    <InputText id="precio" value={`$${formData.precioNueva}`} disabled />
-                </div>
-                <div className="flex justify-content-between mt-3">
-                    <Button label="Cancelar" onClick={() => setShowForm(false)} className="p-button-secondary" />
-                    <Button label="Confirmar" onClick={handleConfirmar} />
-                </div>
+                <form onSubmit={formik.handleSubmit}>
+                    {/* Campo de Número de Tarjeta */}
+                    <div className="field mt-3">
+                        <label htmlFor="numtar">Número de Tarjeta</label>
+                        <br />
+                        <InputText
+                            id="numtar"
+                            value={formik.values.numtar}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className={formik.errors.numtar && formik.touched.numtar ? 'p-invalid' : ''}
+                        />
+                        {formik.errors.numtar && formik.touched.numtar && (
+                            <small className="p-error">{formik.errors.numtar}</small>
+                        )}
+                    </div>
+
+                    {/* Campo de Fecha de Vencimiento */}
+                    <div className="field mt-3">
+                        <label htmlFor="fechaVencimiento">Fecha de Vencimiento (MM/YY)</label>
+                        <InputText
+                            id="fechaVencimiento"
+                            value={formik.values.fechaVencimiento}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className={formik.errors.fechaVencimiento && formik.touched.fechaVencimiento ? 'p-invalid' : ''}
+                        />
+                        {formik.errors.fechaVencimiento && formik.touched.fechaVencimiento && (
+                            <small className="p-error">{formik.errors.fechaVencimiento}</small>
+                        )}
+                    </div>
+
+                    <div className="field mt-3">
+                        <label htmlFor="cvv">CVV</label>
+                        <br />
+                        <InputText
+                            id="cvv"
+                            value={formik.values.cvv}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className={formik.errors.cvv && formik.touched.cvv ? 'p-invalid' : ''}
+                        />
+                        {formik.errors.cvv && formik.touched.cvv && (
+                            <small className="p-error">{formik.errors.cvv}</small>
+                        )}
+                    </div>
+                    <div className="field mt-3">
+                        <label htmlFor="fecha">Fecha</label>
+                        <Calendar
+                            id="fecha"
+                            value={formData.fecha}
+                            onChange={(e) => setFormData({ ...formData, fecha: e.value })}
+                            dateFormat="dd/mm/yy"
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="field mt-3">
+                        <label htmlFor="membresiaActual">Membresía Actual</label>
+                        <InputText id="membresiaActual" value={formData.membresiaActual} disabled />
+                    </div>
+                    <div className="field mt-3">
+                        <label htmlFor="membresiaNueva">Nueva Membresía</label>
+                        <InputText id="membresiaNueva" value={formData.membresiaNuevaNombre} disabled />
+                    </div>
+                    <div className="field mt-3">
+                        <label htmlFor="precio">Precio Nueva Membresía</label>
+                        <InputText id="precio" value={`$${formData.precioNueva}`} disabled />
+                    </div>
+                    <div className="flex justify-content-between mt-3">
+                        <Button label="Cancelar" onClick={() => setShowForm(false)} className="p-button-secondary" />
+
+                        <Button
+                            label="Confirmar"
+                            onClick={formik.handleSubmit}
+                            type="submit"
+                            className="p-button"
+                            disabled={!formik.isValid || !formik.dirty} // Habilitar solo si el formulario es válido y modificado
+                        />
+                    </div>
+                </form>
             </Dialog>
         </div>
     );
