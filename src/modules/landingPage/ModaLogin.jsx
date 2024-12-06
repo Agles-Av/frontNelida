@@ -92,13 +92,13 @@ const ModaLogin = ({ abrir, onHide }) => {
         nombre: Yup.string()
             .required('El nombre es obligatorio')
             .max(45, 'El nombre no puede tener más de 45 caracteres')
-            .matches(/^[a-zA-Z\s]+$/, 'El nombre solo puede contener letras'),
+            .matches(/^[a-zA-ZñÑ\s]+$/, 'El nombre solo puede contener letras'),
         apPaterno: Yup.string()
             .required('El apellido paterno es obligatorio')
-            .matches(/^[a-zA-Z\s]+$/, 'El nombre solo puede contener letras')
+            .matches(/^[a-zA-ZñÑ\s]+$/, 'El apellido paterno solo puede contener letras')
             .max(45, 'El apellido no puede tener más de 45 caracteres'),
         apMaterno: Yup.string()
-            .matches(/^[a-zA-Z\s]+$/, 'El nombre solo puede contener letras')
+            .matches(/^[a-zA-ZñÑ\s]+$/, 'El apellido materno solo puede contener letras')
             .max(45, 'El apellido no puede tener más de 45 caracteres'),
         email: Yup.string()
             .email('Correo electrónico inválido')
@@ -126,6 +126,7 @@ const ModaLogin = ({ abrir, onHide }) => {
             .required('El código CVV es obligatorio')
             .matches(/^\d{3}$/, 'El CVV debe tener 3 dígitos'),
     });
+    
 
     return (
         <div className="card flex justify-content-center">
