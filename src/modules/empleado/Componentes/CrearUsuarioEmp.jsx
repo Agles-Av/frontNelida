@@ -12,7 +12,6 @@ import AxiosCLient from '../../../config/http-gateway/http-client';
 import { Dropdown } from 'primereact/dropdown';
 
 const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
-
     const stepperRef = useRef(null);
     const [roles, setRoles] = useState([]);
     const[selectedRole, setSelectedRole] = useState(null);
@@ -70,7 +69,6 @@ const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
         if (file) {
             try {
                 const coso = await convertirImagenBase64(file);
-                console.log(coso);
                 setFieldValue({ ...initialValues, foto: coso });
             } catch (error) {
                 console.error("Error al convertir la imagen:", error);
@@ -82,7 +80,6 @@ const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
 
     const handleSubmit = async (values) => {
         try {
-            console.log("Formulario enviado:", values);
             values.role = selectedRole;
 
             const response = await AxiosCLient({
@@ -92,7 +89,6 @@ const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
             });
 
             if (!response.error) {
-                console.log("Usuario creado con éxito:", response.data);
                 getUser();
                 messages.current.show({
                     sticky: true,
@@ -306,7 +302,6 @@ const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
                                             mode="basic"
                                             name="file"
                                             accept="image/*"
-                                            chooseLabel="Cargar foto"
                                             onSelect={(e) => {
                                                 const file = e.files[0];
                                                 if (file) {
@@ -343,5 +338,4 @@ const CrearUsuarioEmp = ({ abrir, onHide, getUser, messages }) => {
         </div>
     )
 }
-
 export default CrearUsuarioEmp

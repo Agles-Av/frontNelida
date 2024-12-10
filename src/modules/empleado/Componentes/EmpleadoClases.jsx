@@ -20,6 +20,12 @@ const EmpleadoClases = ()=>{
 
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+
+
+
     // Obtener datos del usuario desde localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
@@ -216,6 +222,7 @@ const EmpleadoClases = ()=>{
                         onChange={(e) => setFecha(e.value)}
                         dateFormat="dd/mm/yy"
                         className="w-full"
+                        minDate={today} // Bloquea fechas pasadas
                     />
                 </div>
                 <div className="mt-4 flex justify-content-end gap-2">

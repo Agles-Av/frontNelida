@@ -14,6 +14,10 @@ const SPA = () =>{
     // Dirección base del servidor
     const BASE_URL = import.meta.env.VITE_APP_SERVER_URL;
 
+    // Fecha actual (para bloquear fechas pasadas)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Asegura que solo cuente la parte de la fecha sin horas
+
     // Manejador para agendar la cita
     const handleAgendar = async () => {
         if (!correo || !correo.includes("@")) {
@@ -120,13 +124,13 @@ const SPA = () =>{
                         onChange={(e) => setFecha(e.value)}
                         dateFormat="dd/mm/yy"
                         className="w-full"
+                        minDate={today} // Bloquea fechas pasadas
                     />
                 </div>
             </Dialog>
         </div>
     );
 };
-
 
 export default SPA
 
